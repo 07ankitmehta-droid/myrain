@@ -244,6 +244,15 @@
     font-style: italic;
   }
 
+  .section-title {
+    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--rain-bright);
+    text-align: center;
+    margin-top: 4px;
+  }
+
   .area-row {
     display: flex;
     gap: 8px;
@@ -391,13 +400,28 @@
   <div class="hero">
     <div class="logo-wrap">
       <svg viewBox="0 0 100 100" fill="none">
-        <path class="cloud-shape" d="M28 55 C18 55 12 47 12 39 C12 30 20 23 29 24 C31 14 40 7 51 7 C63 7 73 16 74 28 C82 29 88 36 88 44 C88 51 82 57 74 57 L28 57 Z"
-          fill="var(--mist)" opacity="0.92"/>
+        <defs>
+          <radialGradient id="cloudGrad" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="100%" stop-color="#C7D2D6"/>
+          </radialGradient>
+          <linearGradient id="dropGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#8AD2E3"/>
+            <stop offset="100%" stop-color="#4A9BB0"/>
+          </linearGradient>
+          <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#0A1114" flood-opacity="0.35"/>
+          </filter>
+        </defs>
+        <g filter="url(#softShadow)">
+          <path class="cloud-shape" d="M28 55 C18 55 12 47 12 39 C12 30 20 23 29 24 C31 14 40 7 51 7 C63 7 73 16 74 28 C82 29 88 36 88 44 C88 51 82 57 74 57 L28 57 Z"
+            fill="url(#cloudGrad)"/>
+        </g>
         <g class="drop-fall">
           <path d="M50 62 C50 62 40 75 40 83 C40 89 45 93 50 93 C55 93 60 89 60 83 C60 75 50 62 50 62 Z"
-            fill="var(--rain-bright)"/>
+            fill="url(#dropGrad)"/>
+          <ellipse cx="46" cy="80" rx="2.5" ry="4" fill="#D9F4FA" opacity="0.7"/>
         </g>
-        <text x="50" y="85" text-anchor="middle" font-family="Noto Serif, serif" font-size="15" font-weight="700" fill="var(--sky-deep)" class="question-mark" id="qmark">?</text>
       </svg>
     </div>
     <div class="brand"><span id="brand-my">My</span><span class="rain-part" id="brand-rain">Rain</span></div>
@@ -448,6 +472,7 @@
       <div class="light-rain-note" id="lightRainNote" style="display:none;"></div>
     </div>
 
+    <div class="section-title" id="sectionTitle">This much water can —</div>
     <div class="compare-card">
       <div class="compare-icon" id="compareIcon">🚿</div>
       <div class="compare-text" id="compareText">Enter your area to see what this water could do.</div>
@@ -475,6 +500,7 @@ let hasLocation = false;
 const translations = {
   en: {
     tagline: "Find out exactly how much rain fell on your roof today — in real liters.",
+    taglineFarm: "Find out exactly how much rain fell on your land today — in real liters.",
     btnText: "Check My Rain",
     btnTextLoading: "Checking the sky…",
     locLabel: "Your location",
@@ -485,7 +511,10 @@ const translations = {
     litersLabelFarm: "Rain fallen on your land",
     modeRoof: "My Roof",
     modeFarm: "My Land",
+    sectionTitle: "This much water can —",
     lightRainCaption: "It was a light drizzle today — small in depth, but still real water on the ground.",
+    noRainCaption: "No measurable rain fell at your location today.",
+    noRainCompare: "Check back after it rains to see what that water could do.",
     resetBtn: "Check a different location",
     footerNote: "Rainfall data from Open-Meteo, based on your GPS location.<br>Water comparisons based on Ministry of Housing & Urban Affairs (India) domestic usage standards (135 L/person/day).",
     enterArea: "Enter your area to see what this water could do.",
@@ -503,7 +532,8 @@ const translations = {
   },
   hi: {
     tagline: "आज आपकी छत पर कितनी बारिश हुई — असली लीटर में जानिए।",
-    btnText: "मेरी बारिश देखें",
+    taglineFarm: "आज आपकी ज़मीन पर कितनी बारिश हुई — असली लीटर में जानिए।",
+    btnText: "मेरी बारिश",
     btnTextLoading: "आसमान से पूछ रहे हैं…",
     locLabel: "आपका स्थान",
     mmLabel: "मिमी बारिश आज",
@@ -513,7 +543,10 @@ const translations = {
     litersLabelFarm: "आपकी ज़मीन पर गिरी बारिश",
     modeRoof: "मेरी छत",
     modeFarm: "मेरी ज़मीन",
+    sectionTitle: "इतना पानी कर सकता है —",
     lightRainCaption: "आज हल्की बूंदाबांदी हुई — मात्रा कम है, पर ज़मीन पर पानी असली है।",
+    noRainCaption: "आज आपके स्थान पर मापने लायक बारिश नहीं हुई।",
+    noRainCompare: "बारिश होने के बाद दोबारा देखें कि वह पानी क्या कर सकता है।",
     resetBtn: "दूसरी जगह देखें",
     footerNote: "बारिश का डेटा Open-Meteo से, आपके GPS स्थान के आधार पर।<br>पानी तुलना भारत सरकार आवासन एवं शहरी कार्य मंत्रालय के मानकों पर आधारित (135 लीटर/व्यक्ति/दिन)।",
     enterArea: "यह पानी क्या कर सकता है, जानने के लिए क्षेत्रफल डालें।",
@@ -598,6 +631,7 @@ function setLang(lang) {
   document.getElementById('footerNote').innerHTML = t.footerNote;
   document.getElementById('modeRoofLabel').textContent = t.modeRoof;
   document.getElementById('modeFarmLabel').textContent = t.modeFarm;
+  document.getElementById('sectionTitle').textContent = t.sectionTitle;
 
   const bighaSelect = document.getElementById('bighaRegion');
   const currentIdx = bighaSelect.selectedIndex;
@@ -618,6 +652,7 @@ function setMode(mode) {
   const t = translations[currentLang];
   document.getElementById('areaFieldLabel').textContent = mode === 'roof' ? t.areaFieldLabelRoof : t.areaFieldLabelFarm;
   document.getElementById('litersLabel').textContent = mode === 'roof' ? t.litersLabelRoof : t.litersLabelFarm;
+  document.getElementById('tagline').innerHTML = mode === 'roof' ? t.tagline : t.taglineFarm;
   if (document.getElementById('areaInput').value) {
     calculate();
   }
@@ -657,13 +692,13 @@ async function checkRain() {
 
       let geoName = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
       try {
-        const nomRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14&addressdetails=1`, {
+        const nomRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=17&addressdetails=1`, {
           headers: { 'Accept-Language': currentLang === 'hi' ? 'hi' : 'en' }
         });
         const nomData = await nomRes.json();
         if (nomData.address) {
           const a = nomData.address;
-          const place = a.village || a.hamlet || a.town || a.suburb || a.city_district || a.city || a.municipality || a.county;
+          const place = a.hamlet || a.village || a.suburb || a.neighbourhood || a.town || a.city_district || a.city || a.municipality || a.county;
           const region = a.state_district || a.state || a.region;
           if (place && region) {
             geoName = `${place}, ${region}`;
@@ -689,7 +724,6 @@ async function checkRain() {
       hasLocation = true;
       document.getElementById('mmNumber').textContent = todayRainMM.toFixed(1);
       document.getElementById('resultSection').classList.add('visible');
-      document.getElementById('qmark').style.opacity = '0';
 
       calculate();
 
@@ -735,13 +769,24 @@ function calculate() {
     return;
   }
 
+  const lightNote = document.getElementById('lightRainNote');
+
+  if (todayRainMM < 0.1) {
+    document.getElementById('litersNumber').textContent = '0 L';
+    lightNote.textContent = t.noRainCaption;
+    lightNote.style.display = 'block';
+    document.getElementById('compareText').textContent = t.noRainCompare;
+    document.getElementById('compareIcon').textContent = '☀️';
+    stopCompareRotation();
+    return;
+  }
+
   const sqm = areaToSqm(areaVal, unit);
   const liters = todayRainMM * sqm;
 
   document.getElementById('litersNumber').textContent = Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
 
-  const lightNote = document.getElementById('lightRainNote');
-  if (todayRainMM < 0.5 && todayRainMM > 0) {
+  if (todayRainMM < 1) {
     lightNote.textContent = t.lightRainCaption;
     lightNote.style.display = 'block';
   } else {
@@ -791,7 +836,6 @@ function renderCompare(liters) {
 function resetApp() {
   document.getElementById('resultSection').classList.remove('visible');
   document.getElementById('areaInput').value = '';
-  document.getElementById('qmark').style.opacity = '1';
   stopCompareRotation();
   document.getElementById('statusLine').textContent = '';
 }
