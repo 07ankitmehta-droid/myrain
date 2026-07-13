@@ -75,13 +75,13 @@
 
   .hero {
     text-align: center;
-    padding: 56px 0 32px;
+    padding: 20px 0 20px;
   }
 
   .logo-wrap {
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 20px;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 10px;
     position: relative;
   }
 
@@ -103,20 +103,20 @@
 
   .brand {
     font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
-    font-size: 34px;
+    font-size: 24px;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--mist);
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
 
   .brand .rain-part { color: var(--rain-bright); }
 
   .tagline {
-    font-size: 15px;
+    font-size: 13.5px;
     color: var(--mist-dim);
-    line-height: 1.5;
-    max-width: 320px;
+    line-height: 1.45;
+    max-width: 300px;
     margin: 0 auto;
   }
 
@@ -438,6 +438,7 @@ const translations = {
     resetBtn: "Check a different location",
     footerNote: "Rainfall data from Open-Meteo, based on your GPS location.<br>Water comparisons based on Ministry of Housing & Urban Affairs (India) domestic usage standards (135 L/person/day).",
     enterArea: "Enter your area to see what this water could do.",
+    tooLittleRain: "Too little rain today to really notice or collect — not enough to make a difference.",
     noRain: "No rain recorded at your location today.",
     locationDenied: "Location access denied. Please allow location to check your rain.",
     fetchError: "Could not fetch rain data. Please try again.",
@@ -460,6 +461,7 @@ const translations = {
     resetBtn: "दूसरी जगह देखें",
     footerNote: "बारिश का डेटा Open-Meteo से, आपके GPS स्थान के आधार पर।<br>पानी तुलना भारत सरकार आवासन एवं शहरी कार्य मंत्रालय के मानकों पर आधारित (135 लीटर/व्यक्ति/दिन)।",
     enterArea: "यह पानी क्या कर सकता है, जानने के लिए क्षेत्रफल डालें।",
+    tooLittleRain: "आज इतनी कम बारिश हुई कि उसे महसूस करना या जमा करना मुश्किल है।",
     noRain: "आज आपके स्थान पर बारिश दर्ज नहीं हुई।",
     locationDenied: "स्थान की अनुमति नहीं मिली। कृपया लोकेशन की अनुमति दें।",
     fetchError: "बारिश का डेटा नहीं मिल पाया। दोबारा कोशिश करें।",
@@ -558,12 +560,27 @@ async function checkRain() {
 
       let geoName = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
       try {
-        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1`);
-        const geoData = await geoRes.json();
-        if (geoData.results && geoData.results[0]) {
-          geoName = geoData.results[0].name + (geoData.results[0].admin1 ? ', ' + geoData.results[0].admin1 : '');
+        const nomRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14&addressdetails=1`, {
+          headers: { 'Accept-Language': currentLang === 'hi' ? 'hi' : 'en' }
+        });
+        const nomData = await nomRes.json();
+        if (nomData.address) {
+          const a = nomData.address;
+          const place = a.village || a.hamlet || a.town || a.suburb || a.city_district || a.city || a.county;
+          const region = a.state_district || a.state;
+          if (place) {
+            geoName = region ? `${place}, ${region}` : place;
+          }
         }
-      } catch (e) {}
+      } catch (e) {
+        try {
+          const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1`);
+          const geoData = await geoRes.json();
+          if (geoData.results && geoData.results[0]) {
+            geoName = geoData.results[0].name + (geoData.results[0].admin1 ? ', ' + geoData.results[0].admin1 : '');
+          }
+        } catch (e2) {}
+      }
 
       document.getElementById('locLabel').textContent = geoName;
       document.getElementById('mmNumber').textContent = todayRainMM.toFixed(1);
@@ -605,6 +622,16 @@ function calculate() {
   const areaVal = parseFloat(document.getElementById('areaInput').value);
   const unit = document.getElementById('unitSelect').value;
   const t = translations[currentLang];
+
+  const NOTICEABLE_THRESHOLD_MM = 0.5;
+
+  if (todayRainMM < NOTICEABLE_THRESHOLD_MM) {
+    document.getElementById('litersNumber').textContent = currentLang === 'hi' ? 'लगभग नहीं' : 'Almost none';
+    document.getElementById('compareText').textContent = t.tooLittleRain;
+    document.getElementById('compareIcon').textContent = '🌤️';
+    stopCompareRotation();
+    return;
+  }
 
   if (!areaVal || areaVal <= 0) {
     document.getElementById('litersNumber').textContent = '0 L';
