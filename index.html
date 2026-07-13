@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MyRain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700&family=Noto+Serif+Devanagari:wght@400;600;700&family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #212B31;
+    --sky-deep: #161D22;
+    --mist: #E9EEF0;
+    --mist-dim: #A9B6BB;
+    --earth: #9C5A34;
+    --earth-bright: #C77A4C;
+    --rain: #4A9BB0;
+    --rain-bright: #6FC0D4;
+    --card: #2A363D;
+    --card-line: #3A4750;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: linear-gradient(180deg, var(--sky-deep) 0%, var(--sky) 60%, #2A3840 100%);
+    color: var(--mist);
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    padding: 24px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .lang-toggle {
+    position: absolute;
+    top: 24px;
+    right: 20px;
+    display: flex;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 100px;
+    padding: 4px;
+    z-index: 10;
+  }
+
+  .lang-btn {
+    background: none;
+    border: none;
+    color: var(--mist-dim);
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .lang-btn.active {
+    background: var(--earth);
+    color: var(--mist);
+  }
+
+  .hero {
+    text-align: center;
+    padding: 56px 0 32px;
+  }
+
+  .logo-wrap {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  .logo-wrap svg { width: 100%; height: 100%; overflow: visible; }
+
+  .drop-fall {
+    animation: fall 2.6s ease-in-out infinite;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(-6px); opacity: 0.4; }
+    50% { transform: translateY(4px); opacity: 1; }
+    100% { transform: translateY(-6px); opacity: 0.4; }
+  }
+
+  .question-mark {
+    transition: opacity 0.5s ease;
+  }
+
+  .brand {
+    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--mist);
+    margin-bottom: 10px;
+  }
+
+  .brand .rain-part { color: var(--rain-bright); }
+
+  .tagline {
+    font-size: 15px;
+    color: var(--mist-dim);
+    line-height: 1.5;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .check-btn {
+    margin-top: 32px;
+    background: var(--earth);
+    color: var(--mist);
+    border: none;
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 16px 32px;
+    border-radius: 14px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 280px;
+    transition: background 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 4px 18px rgba(156, 90, 52, 0.35);
+  }
+
+  .check-btn:active { transform: scale(0.97); }
+  .check-btn:hover { background: var(--earth-bright); }
+  .check-btn:disabled { opacity: 0.6; cursor: wait; }
+
+  .status-line {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--mist-dim);
+    min-height: 18px;
+  }
+
+  .result-section {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    animation: riseIn 0.5s ease;
+  }
+
+  .result-section.visible { display: flex; }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .rain-card {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 18px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .location-label {
+    font-size: 13px;
+    color: var(--mist-dim);
+    margin-bottom: 4px;
+  }
+
+  .mm-number {
+    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--rain-bright);
+    line-height: 1;
+    margin: 6px 0;
+  }
+
+  .mm-label {
+    font-size: 13px;
+    color: var(--mist-dim);
+  }
+
+  .area-card {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 18px;
+    padding: 20px;
+  }
+
+  .field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mist-dim);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .area-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .area-input {
+    flex: 1;
+    background: var(--sky-deep);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    color: var(--mist);
+    font-size: 16px;
+    font-family: 'Noto Sans', sans-serif;
+    padding: 12px 14px;
+    width: 100%;
+  }
+
+  .area-input:focus { outline: 2px solid var(--rain); }
+
+  .unit-select {
+    background: var(--sky-deep);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    color: var(--mist);
+    font-size: 15px;
+    font-family: 'Noto Sans', sans-serif;
+    padding: 12px 10px;
+  }
+
+  .bigha-note {
+    margin-top: 10px;
+    display: none;
+  }
+
+  .bigha-note.visible { display: block; }
+
+  .bigha-note select {
+    width: 100%;
+    background: var(--sky-deep);
+    border: 1px solid var(--card-line);
+    border-radius: 10px;
+    color: var(--mist-dim);
+    font-size: 13px;
+    padding: 10px;
+    font-family: 'Noto Sans', sans-serif;
+  }
+
+  .liters-card {
+    background: linear-gradient(135deg, var(--rain) 0%, #3A7E90 100%);
+    border-radius: 18px;
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .liters-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 6px;
+  }
+
+  .liters-number {
+    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.1;
+  }
+
+  .compare-card {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 18px;
+    padding: 20px 22px;
+    min-height: 84px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .compare-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .compare-text {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--mist);
+    transition: opacity 0.4s ease;
+  }
+
+  .compare-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: -6px;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--card-line);
+    transition: background 0.3s ease;
+  }
+
+  .dot.active { background: var(--rain-bright); }
+
+  .reset-link {
+    text-align: center;
+    color: var(--mist-dim);
+    font-size: 13px;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: 'Noto Sans', sans-serif;
+  }
+
+  .footer-note {
+    margin-top: auto;
+    padding-top: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: #5A6870;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 380px) {
+    .brand { font-size: 30px; }
+    .mm-number { font-size: 38px; }
+    .liters-number { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-hi" onclick="setLang('hi')">हिं</button>
+  </div>
+
+  <div class="hero">
+    <div class="logo-wrap">
+      <svg viewBox="0 0 100 100" fill="none">
+        <path class="cloud-shape" d="M28 55 C18 55 12 47 12 39 C12 30 20 23 29 24 C31 14 40 7 51 7 C63 7 73 16 74 28 C82 29 88 36 88 44 C88 51 82 57 74 57 L28 57 Z"
+          fill="var(--mist)" opacity="0.92"/>
+        <g class="drop-fall">
+          <path d="M50 62 C50 62 40 75 40 83 C40 89 45 93 50 93 C55 93 60 89 60 83 C60 75 50 62 50 62 Z"
+            fill="var(--rain-bright)"/>
+        </g>
+        <text x="50" y="85" text-anchor="middle" font-family="Noto Serif, serif" font-size="15" font-weight="700" fill="var(--sky-deep)" class="question-mark" id="qmark">?</text>
+      </svg>
+    </div>
+    <div class="brand"><span id="brand-my">My</span><span class="rain-part" id="brand-rain">Rain</span></div>
+    <div class="tagline" id="tagline">Find out exactly how much rain fell on your roof today — in real liters.</div>
+
+    <button class="check-btn" id="checkBtn" onclick="checkRain()">
+      <span id="btn-text">Check My Rain</span>
+    </button>
+    <div class="status-line" id="statusLine"></div>
+  </div>
+
+  <div class="result-section" id="resultSection">
+    <div class="rain-card">
+      <div class="location-label" id="locLabel">Your location</div>
+      <div class="mm-number" id="mmNumber">0</div>
+      <div class="mm-label" id="mmLabel">mm of rain today</div>
+    </div>
+
+    <div class="area-card">
+      <label class="field-label" id="areaFieldLabel">Your roof / house area</label>
+      <div class="area-row">
+        <input type="number" class="area-input" id="areaInput" placeholder="e.g. 1200" oninput="calculate()">
+        <select class="unit-select" id="unitSelect" onchange="onUnitChange()">
+          <option value="sqft">sq ft</option>
+          <option value="sqm">m²</option>
+          <option value="acre">Acre</option>
+          <option value="bigha">Bigha</option>
+        </select>
+      </div>
+      <div class="bigha-note" id="bighaNote">
+        <select id="bighaRegion" onchange="calculate()">
+          <option value="mp">Madhya Pradesh — 1 Bigha ≈ 1,008 m²</option>
+          <option value="up">Uttar Pradesh — 1 Bigha ≈ 2,529 m²</option>
+          <option value="punjab">Punjab / Haryana — 1 Bigha ≈ 2,508 m² (Pucca)</option>
+          <option value="rajasthan">Rajasthan — 1 Bigha ≈ 1,618 m²</option>
+          <option value="bengal">West Bengal — 1 Bigha ≈ 1,338 m²</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="liters-card">
+      <div class="liters-label" id="litersLabel">Rain collected on your roof</div>
+      <div class="liters-number" id="litersNumber">0 L</div>
+    </div>
+
+    <div class="compare-card">
+      <div class="compare-icon" id="compareIcon">🚿</div>
+      <div class="compare-text" id="compareText">Enter your area to see what this water could do.</div>
+    </div>
+    <div class="compare-dots" id="compareDots"></div>
+
+    <button class="reset-link" id="resetBtn" onclick="resetApp()">Check a different location</button>
+  </div>
+
+  <div class="footer-note" id="footerNote">
+    Rainfall data from Open-Meteo, based on your GPS location.<br>
+    Water comparisons based on Ministry of Housing & Urban Affairs (India) domestic usage standards (135 L/person/day).
+  </div>
+</div>
+
+<script>
+let currentLang = 'en';
+let todayRainMM = 0;
+let compareIndex = 0;
+let compareInterval = null;
+let locationName = '';
+
+const translations = {
+  en: {
+    tagline: "Find out exactly how much rain fell on your roof today — in real liters.",
+    btnText: "Check My Rain",
+    btnTextLoading: "Checking the sky…",
+    locLabel: "Your location",
+    mmLabel: "mm of rain today",
+    areaFieldLabel: "Your roof / house area",
+    litersLabel: "Rain collected on your roof",
+    resetBtn: "Check a different location",
+    footerNote: "Rainfall data from Open-Meteo, based on your GPS location.<br>Water comparisons based on Ministry of Housing & Urban Affairs (India) domestic usage standards (135 L/person/day).",
+    enterArea: "Enter your area to see what this water could do.",
+    noRain: "No rain recorded at your location today.",
+    locationDenied: "Location access denied. Please allow location to check your rain.",
+    fetchError: "Could not fetch rain data. Please try again.",
+    bighaOptions: [
+      "Madhya Pradesh — 1 Bigha ≈ 1,008 m²",
+      "Uttar Pradesh — 1 Bigha ≈ 2,529 m²",
+      "Punjab / Haryana — 1 Bigha ≈ 2,508 m² (Pucca)",
+      "Rajasthan — 1 Bigha ≈ 1,618 m²",
+      "West Bengal — 1 Bigha ≈ 1,338 m²"
+    ]
+  },
+  hi: {
+    tagline: "आज आपकी छत पर कितनी बारिश हुई — असली लीटर में जानिए।",
+    btnText: "मेरी बारिश देखें",
+    btnTextLoading: "आसमान से पूछ रहे हैं…",
+    locLabel: "आपका स्थान",
+    mmLabel: "मिमी बारिश आज",
+    areaFieldLabel: "आपकी छत / घर का क्षेत्रफल",
+    litersLabel: "आपकी छत पर जमा बारिश",
+    resetBtn: "दूसरी जगह देखें",
+    footerNote: "बारिश का डेटा Open-Meteo से, आपके GPS स्थान के आधार पर।<br>पानी तुलना भारत सरकार आवासन एवं शहरी कार्य मंत्रालय के मानकों पर आधारित (135 लीटर/व्यक्ति/दिन)।",
+    enterArea: "यह पानी क्या कर सकता है, जानने के लिए क्षेत्रफल डालें।",
+    noRain: "आज आपके स्थान पर बारिश दर्ज नहीं हुई।",
+    locationDenied: "स्थान की अनुमति नहीं मिली। कृपया लोकेशन की अनुमति दें।",
+    fetchError: "बारिश का डेटा नहीं मिल पाया। दोबारा कोशिश करें।",
+    bighaOptions: [
+      "मध्य प्रदेश — 1 बीघा ≈ 1,008 वर्ग मीटर",
+      "उत्तर प्रदेश — 1 बीघा ≈ 2,529 वर्ग मीटर",
+      "पंजाब / हरियाणा — 1 बीघा ≈ 2,508 वर्ग मीटर (पक्का)",
+      "राजस्थान — 1 बीघा ≈ 1,618 वर्ग मीटर",
+      "पश्चिम बंगाल — 1 बीघा ≈ 1,338 वर्ग मीटर"
+    ]
+  }
+};
+
+function getComparisons(liters) {
+  const en = [
+    { icon: "🚿", text: (days) => `That's enough for ${days} day${days == 1 ? '' : 's'} of an average city person's total daily water use (135 L/day).` },
+    { icon: "🛁", text: (baths) => `Enough for about ${baths} bucket bath${baths == 1 ? '' : 's'} (55 L each).` },
+    { icon: "🚽", text: (flushes) => `That's around ${flushes} toilet flushes worth of water (10 L each).` },
+    { icon: "👕", text: (loads) => `Enough for roughly ${loads} load${loads == 1 ? '' : 's'} of hand-washing clothes (20 L each).` },
+    { icon: "💧", text: (drinkDays) => `That's ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person (5 L/day).` }
+  ];
+  const hi = [
+    { icon: "🚿", text: (days) => `यह एक शहरी व्यक्ति के ${days} दिन के पूरे पानी उपयोग (135 लीटर/दिन) जितना है।` },
+    { icon: "🛁", text: (baths) => `लगभग ${baths} बाल्टी नहाने ​जितना (हर बाल्टी 55 लीटर)।` },
+    { icon: "🚽", text: (flushes) => `करीब ${flushes} बार टॉयलेट फ्लश जितना (हर बार 10 लीटर)।` },
+    { icon: "👕", text: (loads) => `लगभग ${loads} बार कपड़े धोने जितना (हर बार 20 लीटर)।` },
+    { icon: "💧", text: (drinkDays) => `एक व्यक्ति के ${drinkDays} दिन के पीने के पानी जितना (5 लीटर/दिन)।` }
+  ];
+  const set = currentLang === 'hi' ? hi : en;
+  return [
+    { icon: set[0].icon, text: set[0].text(Math.max(1, Math.round(liters / 135))) },
+    { icon: set[1].icon, text: set[1].text(Math.max(1, Math.round(liters / 55))) },
+    { icon: set[2].icon, text: set[2].text(Math.max(1, Math.round(liters / 10))) },
+    { icon: set[3].icon, text: set[3].text(Math.max(1, Math.round(liters / 20))) },
+    { icon: set[4].icon, text: set[4].text(Math.max(1, Math.round(liters / 5))) }
+  ];
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-hi').classList.toggle('active', lang === 'hi');
+  const t = translations[lang];
+  document.getElementById('tagline').innerHTML = t.tagline;
+  document.getElementById('btn-text').textContent = t.btnText;
+  document.getElementById('locLabel').textContent = t.locLabel;
+  document.getElementById('mmLabel').textContent = t.mmLabel;
+  document.getElementById('areaFieldLabel').textContent = t.areaFieldLabel;
+  document.getElementById('litersLabel').textContent = t.litersLabel;
+  document.getElementById('resetBtn').textContent = t.resetBtn;
+  document.getElementById('footerNote').innerHTML = t.footerNote;
+
+  const bighaSelect = document.getElementById('bighaRegion');
+  const currentIdx = bighaSelect.selectedIndex;
+  t.bighaOptions.forEach((opt, i) => { bighaSelect.options[i].text = opt; });
+  bighaSelect.selectedIndex = currentIdx;
+
+  if (document.getElementById('areaInput').value) {
+    calculate();
+  } else {
+    document.getElementById('compareText').textContent = t.enterArea;
+  }
+}
+
+function onUnitChange() {
+  const unit = document.getElementById('unitSelect').value;
+  document.getElementById('bighaNote').classList.toggle('visible', unit === 'bigha');
+  calculate();
+}
+
+async function checkRain() {
+  const btn = document.getElementById('checkBtn');
+  const status = document.getElementById('statusLine');
+  const t = translations[currentLang];
+
+  btn.disabled = true;
+  document.getElementById('btn-text').textContent = t.btnTextLoading;
+  status.textContent = '';
+
+  if (!navigator.geolocation) {
+    status.textContent = t.locationDenied;
+    btn.disabled = false;
+    document.getElementById('btn-text').textContent = t.btnText;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=auto`;
+      const res = await fetch(url);
+      const data = await res.json();
+      todayRainMM = data.daily.precipitation_sum[0] || 0;
+
+      let geoName = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+      try {
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1`);
+        const geoData = await geoRes.json();
+        if (geoData.results && geoData.results[0]) {
+          geoName = geoData.results[0].name + (geoData.results[0].admin1 ? ', ' + geoData.results[0].admin1 : '');
+        }
+      } catch (e) {}
+
+      document.getElementById('locLabel').textContent = geoName;
+      document.getElementById('mmNumber').textContent = todayRainMM.toFixed(1);
+      document.getElementById('resultSection').classList.add('visible');
+      document.getElementById('qmark').style.opacity = '0';
+
+      calculate();
+
+      btn.disabled = false;
+      document.getElementById('btn-text').textContent = t.btnText;
+      status.textContent = '';
+
+    } catch (e) {
+      status.textContent = t.fetchError;
+      btn.disabled = false;
+      document.getElementById('btn-text').textContent = t.btnText;
+    }
+
+  }, (err) => {
+    status.textContent = t.locationDenied;
+    btn.disabled = false;
+    document.getElementById('btn-text').textContent = t.btnText;
+  });
+}
+
+function areaToSqm(value, unit) {
+  if (unit === 'sqm') return value;
+  if (unit === 'sqft') return value * 0.092903;
+  if (unit === 'acre') return value * 4046.86;
+  if (unit === 'bigha') {
+    const region = document.getElementById('bighaRegion').value;
+    const bighaValues = { mp: 1008, up: 2529, punjab: 2508, rajasthan: 1618, bengal: 1338 };
+    return value * bighaValues[region];
+  }
+  return value;
+}
+
+function calculate() {
+  const areaVal = parseFloat(document.getElementById('areaInput').value);
+  const unit = document.getElementById('unitSelect').value;
+  const t = translations[currentLang];
+
+  if (!areaVal || areaVal <= 0) {
+    document.getElementById('litersNumber').textContent = '0 L';
+    document.getElementById('compareText').textContent = t.enterArea;
+    stopCompareRotation();
+    return;
+  }
+
+  const sqm = areaToSqm(areaVal, unit);
+  const liters = todayRainMM * sqm;
+
+  document.getElementById('litersNumber').textContent = Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
+
+  startCompareRotation(liters);
+}
+
+function startCompareRotation(liters) {
+  stopCompareRotation();
+  compareIndex = 0;
+  renderCompare(liters);
+  compareInterval = setInterval(() => {
+    compareIndex = (compareIndex + 1) % 5;
+    renderCompare(liters);
+  }, 4000);
+}
+
+function stopCompareRotation() {
+  if (compareInterval) clearInterval(compareInterval);
+  document.getElementById('compareDots').innerHTML = '';
+}
+
+function renderCompare(liters) {
+  const comparisons = getComparisons(liters);
+  const c = comparisons[compareIndex];
+  const textEl = document.getElementById('compareText');
+  const iconEl = document.getElementById('compareIcon');
+
+  textEl.style.opacity = '0';
+  setTimeout(() => {
+    textEl.textContent = c.text;
+    iconEl.textContent = c.icon;
+    textEl.style.opacity = '1';
+  }, 200);
+
+  const dotsEl = document.getElementById('compareDots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === compareIndex ? ' active' : '');
+    dotsEl.appendChild(dot);
+  }
+}
+
+function resetApp() {
+  document.getElementById('resultSection').classList.remove('visible');
+  document.getElementById('areaInput').value = '';
+  document.getElementById('qmark').style.opacity = '1';
+  stopCompareRotation();
+  document.getElementById('statusLine').textContent = '';
+}
+
+setLang('en');
+</script>
+
+</body>
+</html>
