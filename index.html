@@ -602,7 +602,7 @@ const translations = {
     litersLabelFarm: "आपकी ज़मीन पर गिरी बारिश",
     modeRoof: "मेरी छत",
     modeFarm: "मेरी ज़मीन",
-    sectionTitle: "इतना पानी कर सकता है —",
+    sectionTitle: "इतने पानी में —",
     lightRainCaption: "आज हल्की बूंदाबांदी हुई — मात्रा कम है, पर ज़मीन पर पानी असली है।",
     noRainCaption: "आज आपके स्थान पर मापने लायक बारिश नहीं हुई।",
     noRainCompare: "बारिश होने के बाद दोबारा देखें कि वह पानी क्या कर सकता है।",
@@ -656,14 +656,14 @@ function getComparisons(liters) {
 
   const en = [
     { icon: "🚿", text: (days) => `That's enough for ${days} day${days == 1 ? '' : 's'} of an average city person's total daily water use (135 L/day).` },
-    { icon: "🛁", text: (baths) => `Enough for about ${baths} bucket bath${baths == 1 ? '' : 's'} (55 L each).` },
+    { icon: "🪣", text: (baths) => `Enough for about ${baths} bucket bath${baths == 1 ? '' : 's'} (55 L each).` },
     { icon: "🚽", text: (flushes) => `That's around ${flushes} toilet flushes worth of water (10 L each).` },
     { icon: "👕", text: (loads) => `Enough for roughly ${loads} load${loads == 1 ? '' : 's'} of hand-washing clothes (20 L each).` },
     { icon: "💧", text: (drinkDays) => `That's ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person (5 L/day).` }
   ];
   const hi = [
     { icon: "🚿", text: (days) => `यह एक शहरी व्यक्ति के ${days} दिन के पूरे पानी उपयोग (135 लीटर/दिन) जितना है।` },
-    { icon: "🛁", text: (baths) => `लगभग ${baths} बाल्टी नहाने ​जितना (हर बाल्टी 55 लीटर)।` },
+    { icon: "🪣", text: (baths) => `लगभग ${baths} बाल्टी नहाने ​जितना (हर बाल्टी 55 लीटर)।` },
     { icon: "🚽", text: (flushes) => `करीब ${flushes} बार टॉयलेट फ्लश जितना (हर बार 10 लीटर)।` },
     { icon: "👕", text: (loads) => `लगभग ${loads} बार कपड़े धोने जितना (हर बार 20 लीटर)।` },
     { icon: "💧", text: (drinkDays) => `एक व्यक्ति के ${drinkDays} दिन के पीने के पानी जितना (5 लीटर/दिन)।` }
@@ -706,6 +706,15 @@ function setLang(lang) {
     calculate();
   } else {
     document.getElementById('compareText').textContent = t.enterArea;
+  }
+
+  if (hasLocation) {
+    const safetyMsg = getSafetyNote();
+    const safetyEl = document.getElementById('safetyNote');
+    if (safetyMsg) {
+      safetyEl.textContent = safetyMsg;
+      safetyEl.style.display = 'block';
+    }
   }
 }
 
