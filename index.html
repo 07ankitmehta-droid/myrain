@@ -198,6 +198,27 @@
     margin-bottom: 4px;
   }
 
+  .location-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .location-row .location-label { margin-bottom: 0; }
+
+  .edit-loc-btn {
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    opacity: 0.6;
+    padding: 2px;
+  }
+
+  .edit-loc-btn:hover { opacity: 1; }
+
   .mm-number {
     font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
     font-size: 44px;
@@ -359,7 +380,7 @@
   }
 
   .compare-icon {
-    font-size: 26px;
+    font-size: 40px;
     flex-shrink: 0;
   }
 
@@ -461,7 +482,10 @@
 
   <div class="result-section" id="resultSection">
     <div class="rain-card">
-      <div class="location-label" id="locLabel">Your location</div>
+      <div class="location-row">
+        <div class="location-label" id="locLabel">Your location</div>
+        <button class="edit-loc-btn" id="editLocBtn" onclick="editLocation()">✏️</button>
+      </div>
       <div class="mm-number" id="mmNumber">0</div>
       <div class="mm-label" id="mmLabel">mm of rain today</div>
     </div>
@@ -685,6 +709,18 @@ function setLang(lang) {
   }
 }
 
+function editLocation() {
+  const t = translations[currentLang];
+  const promptText = currentLang === 'hi' ? 'अपने गाँव/इलाके का सही नाम लिखें:' : 'Type the correct name of your village/area:';
+  const newName = prompt(promptText, locationName);
+  if (newName && newName.trim()) {
+    locationName = newName.trim();
+    localStorage.setItem('myrain_custom_location', locationName);
+    document.getElementById('locLabel').textContent = locationName;
+    hasLocation = true;
+  }
+}
+
 function setMode(mode) {
   currentMode = mode;
   document.getElementById('mode-roof').classList.toggle('active', mode === 'roof');
@@ -777,6 +813,10 @@ async function checkRain() {
         } catch (e2) {}
       }
 
+      const savedCustomName = localStorage.getItem('myrain_custom_location');
+      if (savedCustomName) {
+        geoName = savedCustomName;
+      }
       document.getElementById('locLabel').textContent = geoName;
       locationName = geoName;
       hasLocation = true;
@@ -826,7 +866,7 @@ function areaToSqm(value, unit) {
 
 function getSafetyNote() {
   const t = translations[currentLang];
-  if (currentTemp === null || todayRainMM < 0.1) return '';
+  if (currentTemp === null || todayRainMM < 1) return '';
 
   if (currentWind !== null && currentWind > 30) {
     return t.safetyStormy;
@@ -858,7 +898,7 @@ function calculate() {
 
   const lightNote = document.getElementById('lightRainNote');
 
-  if (todayRainMM < 0.1) {
+  if (todayRainMM < 1) {
     document.getElementById('litersNumber').textContent = '0 L';
     lightNote.textContent = t.noRainCaption;
     lightNote.style.display = 'block';
@@ -873,7 +913,7 @@ function calculate() {
 
   document.getElementById('litersNumber').textContent = Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
 
-  if (todayRainMM < 1) {
+  if (todayRainMM < 2) {
     lightNote.textContent = t.lightRainCaption;
     lightNote.style.display = 'block';
   } else {
