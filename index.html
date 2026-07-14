@@ -371,6 +371,52 @@
     line-height: 1.1;
   }
 
+  .sky-report-title {
+    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--mist);
+    text-align: center;
+    margin-top: 6px;
+  }
+
+  .sky-card {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-left: 4px solid var(--rain-bright);
+    border-radius: 16px;
+    padding: 18px 20px;
+  }
+
+  #sunSkyCard { border-left-color: #E0A848; }
+  #airSkyCard { border-left-color: #8FA6AC; }
+
+  .sky-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--mist-dim);
+    margin-bottom: 8px;
+  }
+
+  .sky-card-icon { font-size: 20px; }
+
+  .sky-card-number {
+    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--mist);
+    margin-bottom: 6px;
+  }
+
+  .sky-card-text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--mist-dim);
+  }
+
   .compare-card {
     background: var(--card);
     border: 1px solid var(--card-line);
@@ -489,8 +535,6 @@
         <div class="location-label" id="locLabel">Your location</div>
         <button class="edit-loc-btn" id="editLocBtn" onclick="editLocation()">✏️</button>
       </div>
-      <div class="mm-number" id="mmNumber">0</div>
-      <div class="mm-label" id="mmLabel">mm of rain today</div>
     </div>
 
     <div class="safety-note" id="safetyNote" style="display:none;"></div>
@@ -521,18 +565,25 @@
       </div>
     </div>
 
-    <div class="liters-card">
-      <div class="liters-label" id="litersLabel">Rain collected on your roof</div>
-      <div class="liters-number" id="litersNumber">0 L</div>
-      <div class="light-rain-note" id="lightRainNote" style="display:none;"></div>
+    <div class="sky-report-title" id="skyReportTitle">Today's Sky Report</div>
+
+    <div class="sky-card" id="rainSkyCard">
+      <div class="sky-card-header"><span class="sky-card-icon">🌧️</span><span id="rainHeader">Rain</span></div>
+      <div class="sky-card-number" id="rainNumber">0 mm</div>
+      <div class="sky-card-text" id="rainText">—</div>
     </div>
 
-    <div class="section-title" id="sectionTitle">This much water can —</div>
-    <div class="compare-card">
-      <div class="compare-icon" id="compareIcon">🚿</div>
-      <div class="compare-text" id="compareText">Enter your area to see what this water could do.</div>
+    <div class="sky-card" id="sunSkyCard">
+      <div class="sky-card-header"><span class="sky-card-icon">☀️</span><span id="sunHeader">Sun</span></div>
+      <div class="sky-card-number" id="sunNumber">0 W</div>
+      <div class="sky-card-text" id="sunText">—</div>
     </div>
-    <div class="compare-dots" id="compareDots"></div>
+
+    <div class="sky-card" id="airSkyCard">
+      <div class="sky-card-header"><span class="sky-card-icon">💨</span><span id="airHeader">Air</span></div>
+      <div class="sky-card-number" id="airNumber">0 L</div>
+      <div class="sky-card-text" id="airText">—</div>
+    </div>
 
     <button class="reset-link" id="resetBtn" onclick="resetApp()">Check a different location</button>
   </div>
@@ -558,11 +609,14 @@ let hasLocation = false;
 
 const translations = {
   en: {
-    tagline: "Find out how much rain fell on your roof today — in real liters.",
-    taglineFarm: "Find out how much rain fell on your land today — in real liters.",
-    btnText: "Check My Rain",
+    tagline: "Rain, sun, or just humid air — find out what your sky is really doing today, over your roof.",
+    taglineFarm: "Rain, sun, or just humid air — find out what your sky is really doing today, over your land.",
+    btnText: "Check My Sky",
     btnTextLoading: "Checking the sky…",
     locLabel: "Your location",
+    skyReportTitle: "Today's Sky Report",
+    sunHeader: "Sun",
+    airHeader: "Air",
     mmLabel: "mm of rain today",
     areaFieldLabelRoof: "Your roof / house area",
     areaFieldLabelFarm: "Your farm / land area",
@@ -575,6 +629,13 @@ const translations = {
     noRainCaption: "No measurable rain fell at your location today.",
     noRainCompare: "Check back after it rains to see what that water could do.",
     airWaterFact: (liters, humidity) => `No rain, but the air itself holds real water — roughly ${liters} L of water vapor in the air right around your land (at ${humidity}% humidity). Not extractable at home, but genuinely there.`,
+    sunLow: (w) => `Low sunlight right now (${w} W) — early morning, evening, or cloudy skies.`,
+    sunLedBulbs: (n) => `Enough right now to power about ${n} LED bulb${n == 1 ? '' : 's'} (9W each).`,
+    sunFans: (n) => `Enough right now to run about ${n} table fan${n == 1 ? '' : 's'} (60W each).`,
+    sunBig: (n) => `Strong sunlight — enough right now for roughly ${n} refrigerator${n == 1 ? '' : 's'} worth of power (150W each).`,
+    airDrinkDays: (liters, days) => `That's roughly ${days} day${days == 1 ? '' : 's'} of drinking water for one person, if this vapor could be condensed.`,
+    noSunText: "No usable sunlight detected right now — try again during daylight hours.",
+    humidityWord: "humidity",
     solarFact: (watts) => `No rain, but real sunlight is hitting your roof right now — enough to generate roughly ${watts} watts if you had solar panels there.`,
     safetyStormy: "🌬️ Winds are strong right now — this feels more like a storm than gentle rain. Best to stay indoors.",
     safetyCold: "🥶 It's quite cool today — getting wet in this could feel chilly fast. Young kids, elderly, or anyone unwell may want to avoid it.",
@@ -597,11 +658,14 @@ const translations = {
     ]
   },
   hi: {
-    tagline: "आज आपकी छत पर कितनी बारिश हुई — असली लीटर में जानिए।",
-    taglineFarm: "आज आपकी ज़मीन पर कितनी बारिश हुई — असली लीटर में जानिए।",
-    btnText: "मेरी बारिश",
+    tagline: "बारिश हो, धूप हो, या बस नमी भरी हवा — आज आपकी छत पर आसमान असल में क्या कर रहा है, जानिए।",
+    taglineFarm: "बारिश हो, धूप हो, या बस नमी भरी हवा — आज आपकी ज़मीन पर आसमान असल में क्या कर रहा है, जानिए।",
+    btnText: "मेरा आसमान",
     btnTextLoading: "आसमान से पूछ रहे हैं…",
     locLabel: "आपका स्थान",
+    skyReportTitle: "आज की आसमान रिपोर्ट",
+    sunHeader: "धूप",
+    airHeader: "हवा",
     mmLabel: "मिमी बारिश आज",
     areaFieldLabelRoof: "आपकी छत / घर का क्षेत्रफल",
     areaFieldLabelFarm: "आपकी खेत / ज़मीन का क्षेत्रफल",
@@ -614,6 +678,13 @@ const translations = {
     noRainCaption: "आज आपके स्थान पर मापने लायक बारिश नहीं हुई।",
     noRainCompare: "बारिश होने के बाद दोबारा देखें कि वह पानी क्या कर सकता है।",
     airWaterFact: (liters, humidity) => `बारिश नहीं है, पर हवा में असली पानी मौजूद है — आपकी ज़मीन के आस-पास की हवा में लगभग ${liters} लीटर पानी की भाप है (${humidity}% नमी पर)। घर पर निकाला नहीं जा सकता, पर सच में मौजूद है।`,
+    sunLow: (w) => `अभी धूप कम है (${w} वाट) — सुबह जल्दी, शाम, या बादल छाए हैं।`,
+    sunLedBulbs: (n) => `अभी लगभग ${n} LED बल्ब चलाने जितनी धूप है (हर एक 9 वाट)।`,
+    sunFans: (n) => `अभी लगभग ${n} टेबल पंखे चलाने जितनी धूप है (हर एक 60 वाट)।`,
+    sunBig: (n) => `तेज़ धूप है — अभी लगभग ${n} फ्रिज चलाने जितनी बिजली बन सकती है (हर एक 150 वाट)।`,
+    airDrinkDays: (liters, days) => `यह लगभग ${days} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह भाप पानी में बदल पाए।`,
+    noSunText: "अभी उपयोगी धूप नहीं मिली — दिन के समय दोबारा कोशिश करें।",
+    humidityWord: "नमी",
     solarFact: (watts) => `बारिश नहीं है, पर अभी आपकी छत पर असली धूप पड़ रही है — अगर वहाँ सोलर पैनल होते, तो लगभग ${watts} वाट बिजली बन सकती थी।`,
     safetyStormy: "🌬️ अभी तेज़ हवा चल रही है — यह हल्की बारिश से ज़्यादा तूफ़ान जैसा लग रहा है। घर के अंदर रहना बेहतर होगा।",
     safetyCold: "🥶 आज काफी ठंड है — इसमें भीगना जल्दी ठंडक महसूस करा सकता है। छोटे बच्चे, बुज़ुर्ग, या बीमार लोग इससे बचें तो अच्छा है।",
@@ -697,25 +768,21 @@ function setLang(lang) {
   if (!hasLocation) {
     document.getElementById('locLabel').textContent = t.locLabel;
   }
-  document.getElementById('mmLabel').textContent = t.mmLabel;
+  document.getElementById('sunHeader').textContent = t.sunHeader;
+  document.getElementById('airHeader').textContent = t.airHeader;
+  document.getElementById('skyReportTitle').textContent = t.skyReportTitle;
   document.getElementById('areaFieldLabel').textContent = currentMode === 'roof' ? t.areaFieldLabelRoof : t.areaFieldLabelFarm;
-  document.getElementById('litersLabel').textContent = currentMode === 'roof' ? t.litersLabelRoof : t.litersLabelFarm;
   document.getElementById('resetBtn').textContent = t.resetBtn;
   document.getElementById('footerNote').innerHTML = t.footerNote;
   document.getElementById('modeRoofLabel').textContent = t.modeRoof;
   document.getElementById('modeFarmLabel').textContent = t.modeFarm;
-  document.getElementById('sectionTitle').textContent = t.sectionTitle;
 
   const bighaSelect = document.getElementById('bighaRegion');
   const currentIdx = bighaSelect.selectedIndex;
   t.bighaOptions.forEach((opt, i) => { bighaSelect.options[i].text = opt; });
   bighaSelect.selectedIndex = currentIdx;
 
-  if (document.getElementById('areaInput').value) {
-    calculate();
-  } else {
-    document.getElementById('compareText').textContent = t.enterArea;
-  }
+  calculate();
 
   if (hasLocation) {
     const safetyMsg = getSafetyNote();
@@ -745,7 +812,6 @@ function setMode(mode) {
   document.getElementById('mode-farm').classList.toggle('active', mode === 'farm');
   const t = translations[currentLang];
   document.getElementById('areaFieldLabel').textContent = mode === 'roof' ? t.areaFieldLabelRoof : t.areaFieldLabelFarm;
-  document.getElementById('litersLabel').textContent = mode === 'roof' ? t.litersLabelRoof : t.litersLabelFarm;
   document.getElementById('tagline').innerHTML = mode === 'roof' ? t.tagline : t.taglineFarm;
 
   const unitSelect = document.getElementById('unitSelect');
@@ -848,7 +914,6 @@ async function checkRain() {
       document.getElementById('locLabel').textContent = geoName;
       locationName = geoName;
       hasLocation = true;
-      document.getElementById('mmNumber').textContent = todayRainMM.toFixed(1);
       document.getElementById('resultSection').classList.add('visible');
       document.querySelector('.hero').classList.add('compact');
 
@@ -925,132 +990,64 @@ function getSafetyNote() {
   return t.safetyWarm;
 }
 
+function getSunComparison(watts, t) {
+  if (watts < 15) return t.sunLow(watts);
+  if (watts < 80) return t.sunLedBulbs(Math.max(1, Math.round(watts / 9)));
+  if (watts < 400) return t.sunFans(Math.max(1, Math.round(watts / 60)));
+  return t.sunBig(Math.max(1, Math.round(watts / 150)));
+}
+
+function getAirComparison(liters, t) {
+  const drinkDays = Math.max(1, Math.round(liters / 5));
+  return t.airDrinkDays(Math.round(liters), drinkDays);
+}
+
 function calculate() {
   const areaVal = parseFloat(document.getElementById('areaInput').value);
   const unit = document.getElementById('unitSelect').value;
   const t = translations[currentLang];
 
   if (!areaVal || areaVal <= 0) {
-    document.getElementById('litersNumber').textContent = '0 L';
-    document.getElementById('compareText').textContent = t.enterArea;
-    document.getElementById('lightRainNote').style.display = 'none';
-    stopCompareRotation();
-    return;
-  }
-
-  const lightNote = document.getElementById('lightRainNote');
-
-  if (todayRainMM < 1) {
-    document.getElementById('litersNumber').textContent = '0 L';
-    lightNote.textContent = t.noRainCaption;
-    lightNote.style.display = 'block';
-
-    const sqm = areaToSqm(areaVal, unit);
-    const airWater = currentHumidity !== null && currentTemp !== null ? calculateAirWater(currentTemp, currentHumidity, sqm) : null;
-    const solarPotential = currentSolar !== null && currentSolar > 0 ? calculateSolarPotential(currentSolar, sqm) : null;
-
-    const facts = [];
-    if (airWater !== null) {
-      facts.push({ icon: '💨', text: t.airWaterFact(Math.round(airWater), currentHumidity) });
-    }
-    if (solarPotential !== null && solarPotential > 0) {
-      facts.push({ icon: '☀️', text: t.solarFact(solarPotential) });
-    }
-
-    if (facts.length > 0) {
-      startFactRotation(facts);
-    } else {
-      document.getElementById('compareText').textContent = t.noRainCompare;
-      document.getElementById('compareIcon').textContent = '⛅';
-      stopCompareRotation();
-    }
+    document.getElementById('rainNumber').textContent = '—';
+    document.getElementById('rainText').textContent = t.enterArea;
+    document.getElementById('sunNumber').textContent = '—';
+    document.getElementById('sunText').textContent = t.enterArea;
+    document.getElementById('airNumber').textContent = '—';
+    document.getElementById('airText').textContent = t.enterArea;
     return;
   }
 
   const sqm = areaToSqm(areaVal, unit);
-  const liters = todayRainMM * sqm;
 
-  document.getElementById('litersNumber').textContent = Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
-
-  if (todayRainMM < 2) {
-    lightNote.textContent = t.lightRainCaption;
-    lightNote.style.display = 'block';
+  // RAIN card
+  if (todayRainMM < 1) {
+    document.getElementById('rainNumber').textContent = '0 mm';
+    document.getElementById('rainText').textContent = t.noRainCaption;
   } else {
-    lightNote.style.display = 'none';
+    const liters = todayRainMM * sqm;
+    document.getElementById('rainNumber').textContent = todayRainMM.toFixed(1) + ' mm · ' + Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
+    const comparisons = getComparisons(liters);
+    document.getElementById('rainText').textContent = comparisons[0].text;
   }
 
-  startCompareRotation(liters);
-}
-
-function startCompareRotation(liters) {
-  stopCompareRotation();
-  compareIndex = 0;
-  renderCompare(liters);
-  compareInterval = setInterval(() => {
-    compareIndex = (compareIndex + 1) % 5;
-    renderCompare(liters);
-  }, 4000);
-}
-
-function stopCompareRotation() {
-  if (compareInterval) clearInterval(compareInterval);
-  if (factInterval) clearInterval(factInterval);
-  document.getElementById('compareDots').innerHTML = '';
-}
-
-function renderCompare(liters) {
-  const comparisons = getComparisons(liters);
-  const c = comparisons[compareIndex];
-  const textEl = document.getElementById('compareText');
-  const iconEl = document.getElementById('compareIcon');
-
-  textEl.style.opacity = '0';
-  setTimeout(() => {
-    textEl.textContent = c.text;
-    iconEl.textContent = c.icon;
-    textEl.style.opacity = '1';
-  }, 200);
-
-  const dotsEl = document.getElementById('compareDots');
-  dotsEl.innerHTML = '';
-  for (let i = 0; i < 5; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'dot' + (i === compareIndex ? ' active' : '');
-    dotsEl.appendChild(dot);
+  // SUN card
+  if (currentSolar !== null && currentSolar > 0) {
+    const watts = calculateSolarPotential(currentSolar, sqm);
+    document.getElementById('sunNumber').textContent = watts.toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' W';
+    document.getElementById('sunText').textContent = getSunComparison(watts, t);
+  } else {
+    document.getElementById('sunNumber').textContent = '0 W';
+    document.getElementById('sunText').textContent = t.noSunText;
   }
-}
 
-let factInterval = null;
-let factIndex = 0;
-
-function startFactRotation(facts) {
-  stopCompareRotation();
-  if (factInterval) clearInterval(factInterval);
-  factIndex = 0;
-  renderFact(facts);
-  factInterval = setInterval(() => {
-    factIndex = (factIndex + 1) % facts.length;
-    renderFact(facts);
-  }, 4500);
-}
-
-function renderFact(facts) {
-  const f = facts[factIndex];
-  const textEl = document.getElementById('compareText');
-  const iconEl = document.getElementById('compareIcon');
-  textEl.style.opacity = '0';
-  setTimeout(() => {
-    textEl.textContent = f.text;
-    iconEl.textContent = f.icon;
-    textEl.style.opacity = '1';
-  }, 200);
-
-  const dotsEl = document.getElementById('compareDots');
-  dotsEl.innerHTML = '';
-  for (let i = 0; i < facts.length; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'dot' + (i === factIndex ? ' active' : '');
-    dotsEl.appendChild(dot);
+  // AIR card
+  if (currentHumidity !== null && currentTemp !== null) {
+    const airWater = calculateAirWater(currentTemp, currentHumidity, sqm);
+    document.getElementById('airNumber').textContent = Math.round(airWater).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
+    document.getElementById('airText').textContent = getAirComparison(airWater, t) + ' (' + currentHumidity + '% ' + t.humidityWord + ')';
+  } else {
+    document.getElementById('airNumber').textContent = '—';
+    document.getElementById('airText').textContent = t.enterArea;
   }
 }
 
@@ -1058,7 +1055,6 @@ function resetApp() {
   document.getElementById('resultSection').classList.remove('visible');
   document.querySelector('.hero').classList.remove('compact');
   document.getElementById('areaInput').value = '';
-  stopCompareRotation();
   document.getElementById('statusLine').textContent = '';
 }
 
