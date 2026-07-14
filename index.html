@@ -22,14 +22,17 @@
     --earth-bright: #C77A4C;
     --rain: #4A9BB0;
     --rain-bright: #6FC0D4;
-    --card: #2A363D;
+    --card: rgba(42, 54, 61, 0.5);
     --card-line: #3A4750;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: linear-gradient(180deg, var(--sky-deep) 0%, var(--sky) 60%, #2A3840 100%);
+    background-image: url("data:image/jpeg;base64,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");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: var(--mist);
     font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
     min-height: 100vh;
@@ -189,6 +192,8 @@
 
   .rain-card {
     background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--card-line);
     border-radius: 18px;
     padding: 24px;
@@ -238,6 +243,8 @@
 
   .area-card {
     background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--card-line);
     border-radius: 16px;
     padding: 12px 16px;
@@ -393,6 +400,8 @@
 
   .sky-card {
     background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--card-line);
     border-left: 4px solid var(--rain-bright);
     border-radius: 16px;
@@ -426,7 +435,7 @@
     margin-bottom: 8px;
   }
 
-  .sky-card-icon { width: 22px; height: 22px; object-fit: contain; }
+  .sky-card-icon { width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
 
   .sky-card-number {
     font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
@@ -478,6 +487,7 @@
     object-fit: contain;
     flex-shrink: 0;
     transition: opacity 0.3s ease, transform 0.3s ease;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5)) drop-shadow(0 0 1px rgba(0,0,0,0.4));
   }
 
   .sky-card-pair .fact-icon-big {
@@ -808,18 +818,18 @@ const translations = {
     trendDown: "↓ less than yesterday",
     trendSame: "≈ same as yesterday",
     sunComparisons: (w, kw, bulbs, fans, homes, acUnits) => [
-      { icon: 'lightning', text: `If this whole area were covered in solar panels, right now they'd generate about ${kw} kW.` },
-      { icon: 'house', text: homes >= 1 ? `That's roughly enough to power ${homes} average Indian home${homes == 1 ? '' : 's'} right now.` : `That's a meaningful share of one home's typical power draw right now.` },
-      { icon: 'ac', text: `Or enough to run about ${acUnits} 1.5-ton AC unit${acUnits == 1 ? '' : 's'} (1500W each).` },
-      { icon: 'bulb', text: bulbs <= 50 ? `On a small scale, that's about ${bulbs} LED bulb${bulbs == 1 ? '' : 's'} (9W each).` : `At full scale, that's thousands of LED bulbs worth — hard to picture, but a real amount of clean power.` },
-      { icon: 'fan', text: `Or roughly ${fans} table fan${fans == 1 ? '' : 's'} running (60W each).` }
+      { icon: 'lightning', text: `${kw} kW potential` },
+      { icon: 'house', text: homes >= 1 ? `${homes} home${homes == 1 ? '' : 's'} powered` : `part of 1 home` },
+      { icon: 'ac', text: `${acUnits} AC unit${acUnits == 1 ? '' : 's'}` },
+      { icon: 'bulb', text: bulbs <= 50 ? `${bulbs} LED bulb${bulbs == 1 ? '' : 's'}` : `${bulbs.toLocaleString()} bulbs` },
+      { icon: 'fan', text: `${fans} table fan${fans == 1 ? '' : 's'}` }
     ],
     airComparisons: (liters, humidity, drinkDays, bottles, showerMins) => [
-      { icon: 'moisture', text: `The air around your land is holding real moisture — about ${liters} L worth, at ${humidity}% humidity.` },
-      { icon: 'glass', text: `That's roughly ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person, if it could be condensed.` },
-      { icon: 'glass', text: `Or about ${bottles} standard 1L water bottle${bottles == 1 ? '' : 's'} worth.` },
-      { icon: 'shower', text: `Enough, in theory, for about ${showerMins} minute${showerMins == 1 ? '' : 's'} of a shower (9L/min).` },
-      { icon: 'moisture', text: `This water isn't extractable at home — but it's genuinely there, all around you, right now.` }
+      { icon: 'moisture', text: `${humidity}% humidity` },
+      { icon: 'glass', text: `${drinkDays} day${drinkDays == 1 ? '' : 's'} drinking water` },
+      { icon: 'glass', text: `${bottles} water bottle${bottles == 1 ? '' : 's'}` },
+      { icon: 'shower', text: `${showerMins} min shower` },
+      { icon: 'moisture', text: `all around you` }
     ],
     solarFact: (watts) => `No rain, but real sunlight is hitting your roof right now — enough to generate roughly ${watts} watts if you had solar panels there.`,
     safetyStormy: "🌬️ Winds are strong right now — this feels more like a storm than gentle rain. Best to stay indoors.",
@@ -882,18 +892,18 @@ const translations = {
     trendDown: "↓ कल से कम",
     trendSame: "≈ कल जैसा",
     sunComparisons: (w, kw, bulbs, fans, homes, acUnits) => [
-      { icon: 'lightning', text: `अगर यह पूरी जगह सोलर पैनल से ढकी होती, तो अभी लगभग ${kw} किलोवाट बिजली बनती।` },
-      { icon: 'house', text: homes >= 1 ? `यह लगभग ${homes} औसत भारतीय घर${homes == 1 ? '' : 'ों'} को अभी चलाने जितना है।` : `यह एक घर की सामान्य बिजली खपत का एक अच्छा हिस्सा है।` },
-      { icon: 'ac', text: `या लगभग ${acUnits} 1.5-टन AC चलाने जितना (हर एक 1500 वाट)।` },
-      { icon: 'bulb', text: bulbs <= 50 ? `छोटे स्तर पर, यह लगभग ${bulbs} LED बल्ब जितना है (हर एक 9 वाट)।` : `पूरे स्तर पर, यह हज़ारों LED बल्ब जितना है — सोचना मुश्किल है, पर यह असली स्वच्छ ऊर्जा है।` },
-      { icon: 'fan', text: `या लगभग ${fans} टेबल पंखे चलाने जितना (हर एक 60 वाट)।` }
+      { icon: 'lightning', text: `${kw} किलोवाट संभावित` },
+      { icon: 'house', text: homes >= 1 ? `${homes} घर चलेंगे` : `1 घर का हिस्सा` },
+      { icon: 'ac', text: `${acUnits} AC चलेगा` },
+      { icon: 'bulb', text: bulbs <= 50 ? `${bulbs} LED बल्ब` : `${bulbs.toLocaleString()} बल्ब` },
+      { icon: 'fan', text: `${fans} टेबल पंखे` }
     ],
     airComparisons: (liters, humidity, drinkDays, bottles, showerMins) => [
-      { icon: 'moisture', text: `आपकी ज़मीन के आस-पास की हवा में असली नमी है — लगभग ${liters} लीटर, ${humidity}% नमी पर।` },
-      { icon: 'glass', text: `यह लगभग ${drinkDays} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह पानी में बदल पाए।` },
-      { icon: 'glass', text: `या लगभग ${bottles} लीटर की पानी की बोतलों जितना।` },
-      { icon: 'shower', text: `सैद्धांतिक रूप से, लगभग ${showerMins} मिनट के शावर जितना (9 लीटर/मिनट)।` },
-      { icon: 'moisture', text: `यह पानी घर पर निकाला नहीं जा सकता — पर यह सच में, अभी आपके चारों ओर मौजूद है।` }
+      { icon: 'moisture', text: `${humidity}% नमी` },
+      { icon: 'glass', text: `${drinkDays} दिन पीने का पानी` },
+      { icon: 'glass', text: `${bottles} बोतलें` },
+      { icon: 'shower', text: `${showerMins} मिनट शावर` },
+      { icon: 'moisture', text: `आपके चारों ओर` }
     ],
     solarFact: (watts) => `बारिश नहीं है, पर अभी आपकी छत पर असली धूप पड़ रही है — अगर वहाँ सोलर पैनल होते, तो लगभग ${watts} वाट बिजली बन सकती थी।`,
     safetyStormy: "🌬️ अभी तेज़ हवा चल रही है — यह हल्की बारिश से ज़्यादा तूफ़ान जैसा लग रहा है। घर के अंदर रहना बेहतर होगा।",
@@ -1001,18 +1011,18 @@ function getAirComparisons(liters, humidity, t) {
 function getComparisons(liters) {
   if (currentMode === 'farm') {
     const enFarm = [
-      { icon: "wheat", text: (sqm) => `That's enough to give roughly ${sqm} m² of crop a full day's watering (at ~4L/m²/day).` },
-      { icon: "cow", text: (cattle) => `Enough drinking water for about ${cattle} cattle for a day (~40 L each).` },
-      { icon: "bucket", text: (buckets) => `That's about ${buckets} buckets (15 L each) of water for farm use.` },
-      { icon: "glass", text: (days) => `Enough for ${days} day${days == 1 ? '' : 's'} of drinking water for a family of 5 (135 L/day total).` },
-      { icon: "tractor", text: (hours) => `Roughly equal to ${hours} hour${hours == 1 ? '' : 's'} of a small irrigation pump running (~2000 L/hour).` }
+      { icon: "wheat", text: (sqm) => `${sqm} m² crop watered` },
+      { icon: "cow", text: (cattle) => `${cattle} cattle's water` },
+      { icon: "bucket", text: (buckets) => `${buckets} buckets` },
+      { icon: "glass", text: (days) => `${days} day${days == 1 ? '' : 's'} drinking water` },
+      { icon: "tractor", text: (hours) => `${hours} hr${hours == 1 ? '' : 's'} pump running` }
     ];
     const hiFarm = [
-      { icon: "wheat", text: (sqm) => `यह लगभग ${sqm} वर्ग मीटर फसल की एक दिन की सिंचाई जितना है (~4 लीटर/वर्ग मीटर/दिन)।` },
-      { icon: "cow", text: (cattle) => `लगभग ${cattle} पशुओं के एक दिन के पीने के पानी जितना (हर एक ~40 लीटर)।` },
-      { icon: "bucket", text: (buckets) => `करीब ${buckets} बाल्टी (हर एक 15 लीटर) पानी जितना।` },
-      { icon: "glass", text: (days) => `5 लोगों के परिवार के ${days} दिन के पीने के पानी जितना (135 लीटर/दिन)।` },
-      { icon: "tractor", text: (hours) => `लगभग एक छोटे सिंचाई पंप के ${hours} घंटे चलने जितना (~2000 लीटर/घंटा)।` }
+      { icon: "wheat", text: (sqm) => `${sqm} वर्ग मी सिंचाई` },
+      { icon: "cow", text: (cattle) => `${cattle} पशुओं का पानी` },
+      { icon: "bucket", text: (buckets) => `${buckets} बाल्टी` },
+      { icon: "glass", text: (days) => `${days} दिन पीने का पानी` },
+      { icon: "tractor", text: (hours) => `${hours} घंटे पंप` }
     ];
     const set = currentLang === 'hi' ? hiFarm : enFarm;
     return [
@@ -1025,18 +1035,18 @@ function getComparisons(liters) {
   }
 
   const en = [
-    { icon: "shower", text: (days) => `That's enough for ${days} day${days == 1 ? '' : 's'} of an average city person's total daily water use (135 L/day).` },
-    { icon: "bucket", text: (baths) => `Enough for about ${baths} full bathing session${baths == 1 ? '' : 's'} worth of water (55 L each, the standard daily bathing allocation).` },
-    { icon: "toilet", text: (flushes) => `That's around ${flushes} toilet flushes worth of water (10 L each).` },
-    { icon: "shirt", text: (loads) => `Enough for roughly ${loads} load${loads == 1 ? '' : 's'} of hand-washing clothes (20 L each).` },
-    { icon: "glass", text: (drinkDays) => `That's ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person (5 L/day).` }
+    { icon: "shower", text: (days) => `${days} day${days == 1 ? '' : 's'} city water use` },
+    { icon: "bucket", text: (baths) => `${baths} bath${baths == 1 ? '' : 's'}` },
+    { icon: "toilet", text: (flushes) => `${flushes} toilet flushes` },
+    { icon: "shirt", text: (loads) => `${loads} laundry load${loads == 1 ? '' : 's'}` },
+    { icon: "glass", text: (drinkDays) => `${drinkDays} day${drinkDays == 1 ? '' : 's'} drinking water` }
   ];
   const hi = [
-    { icon: "shower", text: (days) => `यह एक शहरी व्यक्ति के ${days} दिन के पूरे पानी उपयोग (135 लीटर/दिन) जितना है।` },
-    { icon: "bucket", text: (baths) => `लगभग ${baths} पूरे नहाने ​जितना पानी (हर एक 55 लीटर, रोज़ाना नहाने की मानक मात्रा)।` },
-    { icon: "toilet", text: (flushes) => `करीब ${flushes} बार टॉयलेट फ्लश जितना (हर बार 10 लीटर)।` },
-    { icon: "shirt", text: (loads) => `लगभग ${loads} बार कपड़े धोने जितना (हर बार 20 लीटर)।` },
-    { icon: "glass", text: (drinkDays) => `एक व्यक्ति के ${drinkDays} दिन के पीने के पानी जितना (5 लीटर/दिन)।` }
+    { icon: "shower", text: (days) => `${days} दिन शहरी उपयोग` },
+    { icon: "bucket", text: (baths) => `${baths} स्नान` },
+    { icon: "toilet", text: (flushes) => `${flushes} फ्लश` },
+    { icon: "shirt", text: (loads) => `${loads} कपड़े धोना` },
+    { icon: "glass", text: (drinkDays) => `${drinkDays} दिन पीने का पानी` }
   ];
   const set = currentLang === 'hi' ? hi : en;
   return [
