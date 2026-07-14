@@ -546,6 +546,8 @@ let currentMode = 'roof';
 let todayRainMM = 0;
 let currentTemp = null;
 let currentWind = null;
+let currentHumidity = null;
+let currentSolar = null;
 let compareIndex = 0;
 let compareInterval = null;
 let locationName = '';
@@ -569,6 +571,8 @@ const translations = {
     lightRainCaption: "It was a light drizzle today — small in depth, but still real water on the ground.",
     noRainCaption: "No measurable rain fell at your location today.",
     noRainCompare: "Check back after it rains to see what that water could do.",
+    airWaterFact: (liters, humidity) => `No rain, but the air itself holds real water — roughly ${liters} L of water vapor in the air right around your land (at ${humidity}% humidity). Not extractable at home, but genuinely there.`,
+    solarFact: (watts) => `No rain, but real sunlight is hitting your roof right now — enough to generate roughly ${watts} watts if you had solar panels there.`,
     safetyStormy: "🌬️ Winds are strong right now — this feels more like a storm than gentle rain. Best to stay indoors.",
     safetyCold: "🥶 It's quite cool today — getting wet in this could feel chilly fast. Young kids, elderly, or anyone unwell may want to avoid it.",
     safetyCool: "🌦️ Mild temperature — a short time in this rain is generally fine for most people, but don't linger too long.",
@@ -606,6 +610,8 @@ const translations = {
     lightRainCaption: "आज हल्की बूंदाबांदी हुई — मात्रा कम है, पर ज़मीन पर पानी असली है।",
     noRainCaption: "आज आपके स्थान पर मापने लायक बारिश नहीं हुई।",
     noRainCompare: "बारिश होने के बाद दोबारा देखें कि वह पानी क्या कर सकता है।",
+    airWaterFact: (liters, humidity) => `बारिश नहीं है, पर हवा में असली पानी मौजूद है — आपकी ज़मीन के आस-पास की हवा में लगभग ${liters} लीटर पानी की भाप है (${humidity}% नमी पर)। घर पर निकाला नहीं जा सकता, पर सच में मौजूद है।`,
+    solarFact: (watts) => `बारिश नहीं है, पर अभी आपकी छत पर असली धूप पड़ रही है — अगर वहाँ सोलर पैनल होते, तो लगभग ${watts} वाट बिजली बन सकती थी।`,
     safetyStormy: "🌬️ अभी तेज़ हवा चल रही है — यह हल्की बारिश से ज़्यादा तूफ़ान जैसा लग रहा है। घर के अंदर रहना बेहतर होगा।",
     safetyCold: "🥶 आज काफी ठंड है — इसमें भीगना जल्दी ठंडक महसूस करा सकता है। छोटे बच्चे, बुज़ुर्ग, या बीमार लोग इससे बचें तो अच्छा है।",
     safetyCool: "🌦️ हल्का तापमान है — ज़्यादातर लोगों के लिए थोड़ी देर बारिश में रहना ठीक है, पर ज़्यादा देर न रुकें।",
@@ -786,7 +792,7 @@ async function checkRain() {
     const lon = pos.coords.longitude;
 
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=precipitation&current=temperature_2m,wind_speed_10m&timezone=auto&forecast_days=1`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=precipitation&current=temperature_2m,wind_speed_10m,relative_humidity_2m,shortwave_radiation&timezone=auto&forecast_days=1`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -800,6 +806,8 @@ async function checkRain() {
       todayRainMM = Math.round(rainSoFar * 10) / 10;
       currentTemp = data.current ? data.current.temperature_2m : null;
       currentWind = data.current ? data.current.wind_speed_10m : null;
+      currentHumidity = data.current ? data.current.relative_humidity_2m : null;
+      currentSolar = data.current ? data.current.shortwave_radiation : null;
 
       let geoName = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
       try {
@@ -881,6 +889,20 @@ function areaToSqm(value, unit) {
   return value;
 }
 
+function calculateAirWater(tempC, rhPercent, areaM2) {
+  // Magnus formula for saturation vapor pressure, standard atmospheric science approximation
+  const satPressure = 6.112 * Math.exp((17.67 * tempC) / (tempC + 243.5));
+  const absHumidity = (satPressure * rhPercent * 2.1674) / (273.15 + tempC);
+  const referenceHeightM = 2;
+  const grams = absHumidity * areaM2 * referenceHeightM;
+  return grams / 1000;
+}
+
+function calculateSolarPotential(radiationWm2, areaM2) {
+  const panelEfficiency = 0.18;
+  return Math.round(radiationWm2 * areaM2 * panelEfficiency);
+}
+
 function getSafetyNote() {
   const t = translations[currentLang];
   if (currentTemp === null || todayRainMM < 1) return '';
@@ -919,9 +941,26 @@ function calculate() {
     document.getElementById('litersNumber').textContent = '0 L';
     lightNote.textContent = t.noRainCaption;
     lightNote.style.display = 'block';
-    document.getElementById('compareText').textContent = t.noRainCompare;
-    document.getElementById('compareIcon').textContent = '⛅';
-    stopCompareRotation();
+
+    const sqm = areaToSqm(areaVal, unit);
+    const airWater = currentHumidity !== null && currentTemp !== null ? calculateAirWater(currentTemp, currentHumidity, sqm) : null;
+    const solarPotential = currentSolar !== null && currentSolar > 0 ? calculateSolarPotential(currentSolar, sqm) : null;
+
+    const facts = [];
+    if (airWater !== null) {
+      facts.push({ icon: '💨', text: t.airWaterFact(Math.round(airWater), currentHumidity) });
+    }
+    if (solarPotential !== null && solarPotential > 0) {
+      facts.push({ icon: '☀️', text: t.solarFact(solarPotential) });
+    }
+
+    if (facts.length > 0) {
+      startFactRotation(facts);
+    } else {
+      document.getElementById('compareText').textContent = t.noRainCompare;
+      document.getElementById('compareIcon').textContent = '⛅';
+      stopCompareRotation();
+    }
     return;
   }
 
@@ -952,6 +991,7 @@ function startCompareRotation(liters) {
 
 function stopCompareRotation() {
   if (compareInterval) clearInterval(compareInterval);
+  if (factInterval) clearInterval(factInterval);
   document.getElementById('compareDots').innerHTML = '';
 }
 
@@ -973,6 +1013,40 @@ function renderCompare(liters) {
   for (let i = 0; i < 5; i++) {
     const dot = document.createElement('div');
     dot.className = 'dot' + (i === compareIndex ? ' active' : '');
+    dotsEl.appendChild(dot);
+  }
+}
+
+let factInterval = null;
+let factIndex = 0;
+
+function startFactRotation(facts) {
+  stopCompareRotation();
+  if (factInterval) clearInterval(factInterval);
+  factIndex = 0;
+  renderFact(facts);
+  factInterval = setInterval(() => {
+    factIndex = (factIndex + 1) % facts.length;
+    renderFact(facts);
+  }, 4500);
+}
+
+function renderFact(facts) {
+  const f = facts[factIndex];
+  const textEl = document.getElementById('compareText');
+  const iconEl = document.getElementById('compareIcon');
+  textEl.style.opacity = '0';
+  setTimeout(() => {
+    textEl.textContent = f.text;
+    iconEl.textContent = f.icon;
+    textEl.style.opacity = '1';
+  }, 200);
+
+  const dotsEl = document.getElementById('compareDots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < facts.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === factIndex ? ' active' : '');
     dotsEl.appendChild(dot);
   }
 }
