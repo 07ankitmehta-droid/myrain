@@ -108,10 +108,10 @@
   }
 
   .brand {
-    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
-    font-size: 24px;
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+    font-size: 26px;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.01em;
     color: var(--mist);
     margin-bottom: 6px;
   }
@@ -920,7 +920,7 @@ function calculate() {
     lightNote.textContent = t.noRainCaption;
     lightNote.style.display = 'block';
     document.getElementById('compareText').textContent = t.noRainCompare;
-    document.getElementById('compareIcon').textContent = '☀️';
+    document.getElementById('compareIcon').textContent = '⛅';
     stopCompareRotation();
     return;
   }
