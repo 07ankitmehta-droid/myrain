@@ -380,12 +380,36 @@
     margin-top: 6px;
   }
 
+  .sky-mood {
+    text-align: center;
+    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--mist);
+    margin-bottom: 2px;
+    min-height: 26px;
+  }
+
   .sky-card {
     background: var(--card);
     border: 1px solid var(--card-line);
     border-left: 4px solid var(--rain-bright);
     border-radius: 16px;
     padding: 18px 20px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .sky-card.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .trend-badge {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
   }
 
   #sunSkyCard { border-left-color: #E0A848; }
@@ -565,10 +589,11 @@
       </div>
     </div>
 
+    <div class="sky-mood" id="skyMood"></div>
     <div class="sky-report-title" id="skyReportTitle">Today's Sky Report</div>
 
     <div class="sky-card" id="rainSkyCard">
-      <div class="sky-card-header"><span class="sky-card-icon">🌧️</span><span id="rainHeader">Rain</span></div>
+      <div class="sky-card-header"><span class="sky-card-icon">🌧️</span><span id="rainHeader">Rain</span><span class="trend-badge" id="rainTrend"></span></div>
       <div class="sky-card-number" id="rainNumber">0 mm</div>
       <div class="sky-card-text" id="rainText">—</div>
     </div>
@@ -636,6 +661,29 @@ const translations = {
     airDrinkDays: (liters, days) => `That's roughly ${days} day${days == 1 ? '' : 's'} of drinking water for one person, if this vapor could be condensed.`,
     noSunText: "No usable sunlight detected right now — try again during daylight hours.",
     humidityWord: "humidity",
+    moodWet: "Wet & Heavy 🌧️",
+    moodDrizzly: "Light & Drizzly 🌦️",
+    moodHotDry: "Hot & Dry ☀️",
+    moodWarmHumid: "Warm & Humid 💦",
+    moodCool: "Cool Sky 🌥️",
+    moodMild: "Mild & Clear 🌤️",
+    trendUp: "↑ more than yesterday",
+    trendDown: "↓ less than yesterday",
+    trendSame: "≈ same as yesterday",
+    sunComparisons: (w, bulbs, fans, phones, fridges) => [
+      `Right now, ${w} W of sunlight is hitting this area.`,
+      `Enough to power about ${bulbs} LED bulb${bulbs == 1 ? '' : 's'} (9W each).`,
+      `Or run about ${fans} table fan${fans == 1 ? '' : 's'} (60W each).`,
+      `Could charge roughly ${phones} phone${phones == 1 ? '' : 's'} at once (5W each).`,
+      `On the bigger end, that's close to ${fridges} refrigerator${fridges == 1 ? '' : 's'} worth of power (150W each).`
+    ],
+    airComparisons: (liters, humidity, drinkDays, bottles, showerMins) => [
+      `The air around your land is holding real moisture — about ${liters} L worth, at ${humidity}% humidity.`,
+      `That's roughly ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person, if it could be condensed.`,
+      `Or about ${bottles} standard 1L water bottle${bottles == 1 ? '' : 's'} worth.`,
+      `Enough, in theory, for about ${showerMins} minute${showerMins == 1 ? '' : 's'} of a shower (9L/min).`,
+      `This water isn't extractable at home — but it's genuinely there, all around you, right now.`
+    ],
     solarFact: (watts) => `No rain, but real sunlight is hitting your roof right now — enough to generate roughly ${watts} watts if you had solar panels there.`,
     safetyStormy: "🌬️ Winds are strong right now — this feels more like a storm than gentle rain. Best to stay indoors.",
     safetyCold: "🥶 It's quite cool today — getting wet in this could feel chilly fast. Young kids, elderly, or anyone unwell may want to avoid it.",
@@ -685,6 +733,29 @@ const translations = {
     airDrinkDays: (liters, days) => `यह लगभग ${days} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह भाप पानी में बदल पाए।`,
     noSunText: "अभी उपयोगी धूप नहीं मिली — दिन के समय दोबारा कोशिश करें।",
     humidityWord: "नमी",
+    moodWet: "भीगा और भारी 🌧️",
+    moodDrizzly: "हल्की बूंदाबांदी 🌦️",
+    moodHotDry: "गर्म और सूखा ☀️",
+    moodWarmHumid: "गर्म और उमस भरा 💦",
+    moodCool: "ठंडा आसमान 🌥️",
+    moodMild: "सुहावना और साफ़ 🌤️",
+    trendUp: "↑ कल से ज़्यादा",
+    trendDown: "↓ कल से कम",
+    trendSame: "≈ कल जैसा",
+    sunComparisons: (w, bulbs, fans, phones, fridges) => [
+      `अभी इस जगह पर ${w} वाट धूप पड़ रही है।`,
+      `लगभग ${bulbs} LED बल्ब चलाने जितनी (हर एक 9 वाट)।`,
+      `या करीब ${fans} टेबल पंखे चलाने जितनी (हर एक 60 वाट)।`,
+      `लगभग ${phones} फोन एक साथ चार्ज करने जितनी (हर एक 5 वाट)।`,
+      `ज़्यादा मात्रा में, यह लगभग ${fridges} फ्रिज चलाने जितनी बिजली है (हर एक 150 वाट)।`
+    ],
+    airComparisons: (liters, humidity, drinkDays, bottles, showerMins) => [
+      `आपकी ज़मीन के आस-पास की हवा में असली नमी है — लगभग ${liters} लीटर, ${humidity}% नमी पर।`,
+      `यह लगभग ${drinkDays} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह पानी में बदल पाए।`,
+      `या लगभग ${bottles} लीटर की पानी की बोतलों जितना।`,
+      `सैद्धांतिक रूप से, लगभग ${showerMins} मिनट के शावर जितना (9 लीटर/मिनट)।`,
+      `यह पानी घर पर निकाला नहीं जा सकता — पर यह सच में, अभी आपके चारों ओर मौजूद है।`
+    ],
     solarFact: (watts) => `बारिश नहीं है, पर अभी आपकी छत पर असली धूप पड़ रही है — अगर वहाँ सोलर पैनल होते, तो लगभग ${watts} वाट बिजली बन सकती थी।`,
     safetyStormy: "🌬️ अभी तेज़ हवा चल रही है — यह हल्की बारिश से ज़्यादा तूफ़ान जैसा लग रहा है। घर के अंदर रहना बेहतर होगा।",
     safetyCold: "🥶 आज काफी ठंड है — इसमें भीगना जल्दी ठंडक महसूस करा सकता है। छोटे बच्चे, बुज़ुर्ग, या बीमार लोग इससे बचें तो अच्छा है।",
@@ -707,6 +778,50 @@ const translations = {
     ]
   }
 };
+
+const cardRotations = {};
+
+function startCardRotation(cardKey, items) {
+  if (cardRotations[cardKey]) clearInterval(cardRotations[cardKey].interval);
+  let index = 0;
+  const textEl = document.getElementById(cardKey + 'Text');
+  const numberEl = document.getElementById(cardKey + 'Number');
+
+  const render = () => {
+    const item = items[index];
+    textEl.style.opacity = '0';
+    setTimeout(() => {
+      textEl.textContent = item;
+      textEl.style.opacity = '1';
+    }, 150);
+  };
+  render();
+
+  if (items.length > 1) {
+    const interval = setInterval(() => {
+      index = (index + 1) % items.length;
+      render();
+    }, 4200);
+    cardRotations[cardKey] = { interval };
+  } else {
+    cardRotations[cardKey] = { interval: null };
+  }
+}
+
+function getSunComparisons(watts, t) {
+  const bulbs = Math.max(1, Math.round(watts / 9));
+  const fans = Math.max(1, Math.round(watts / 60));
+  const phones = Math.max(1, Math.round(watts / 5));
+  const fridges = Math.max(1, Math.round(watts / 150));
+  return t.sunComparisons(watts, bulbs, fans, phones, fridges);
+}
+
+function getAirComparisons(liters, humidity, t) {
+  const drinkDays = Math.max(1, Math.round(liters / 5));
+  const bottles = Math.max(1, Math.round(liters / 1));
+  const showerMins = Math.max(1, Math.round(liters / 9));
+  return t.airComparisons(Math.round(liters), humidity, drinkDays, bottles, showerMins);
+}
 
 function getComparisons(liters) {
   if (currentMode === 'farm') {
@@ -771,6 +886,7 @@ function setLang(lang) {
   document.getElementById('sunHeader').textContent = t.sunHeader;
   document.getElementById('airHeader').textContent = t.airHeader;
   document.getElementById('skyReportTitle').textContent = t.skyReportTitle;
+  if (hasLocation) updateSkyMood(t);
   document.getElementById('areaFieldLabel').textContent = currentMode === 'roof' ? t.areaFieldLabelRoof : t.areaFieldLabelFarm;
   document.getElementById('resetBtn').textContent = t.resetBtn;
   document.getElementById('footerNote').innerHTML = t.footerNote;
@@ -990,16 +1106,28 @@ function getSafetyNote() {
   return t.safetyWarm;
 }
 
-function getSunComparison(watts, t) {
-  if (watts < 15) return t.sunLow(watts);
-  if (watts < 80) return t.sunLedBulbs(Math.max(1, Math.round(watts / 9)));
-  if (watts < 400) return t.sunFans(Math.max(1, Math.round(watts / 60)));
-  return t.sunBig(Math.max(1, Math.round(watts / 150)));
-}
-
-function getAirComparison(liters, t) {
-  const drinkDays = Math.max(1, Math.round(liters / 5));
-  return t.airDrinkDays(Math.round(liters), drinkDays);
+function animateNumber(elementId, endText, isNumeric, endValue, suffix) {
+  const el = document.getElementById(elementId);
+  if (!isNumeric) {
+    el.textContent = endText;
+    return;
+  }
+  const duration = 700;
+  const steps = 24;
+  const stepTime = duration / steps;
+  let current = 0;
+  const increment = endValue / steps;
+  let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    current += increment;
+    if (step >= steps) {
+      el.textContent = endText;
+      clearInterval(timer);
+    } else {
+      el.textContent = Math.round(current).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + suffix;
+    }
+  }, stepTime);
 }
 
 function calculate() {
@@ -1018,36 +1146,85 @@ function calculate() {
   }
 
   const sqm = areaToSqm(areaVal, unit);
+  const cards = [
+    document.getElementById('rainSkyCard'),
+    document.getElementById('sunSkyCard'),
+    document.getElementById('airSkyCard')
+  ];
+  cards.forEach((c, i) => {
+    c.classList.remove('revealed');
+    setTimeout(() => c.classList.add('revealed'), i * 150);
+  });
 
   // RAIN card
+  let liters = 0;
   if (todayRainMM < 1) {
     document.getElementById('rainNumber').textContent = '0 mm';
-    document.getElementById('rainText').textContent = t.noRainCaption;
+    startCardRotation('rain', [t.noRainCaption]);
   } else {
-    const liters = todayRainMM * sqm;
-    document.getElementById('rainNumber').textContent = todayRainMM.toFixed(1) + ' mm · ' + Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
-    const comparisons = getComparisons(liters);
-    document.getElementById('rainText').textContent = comparisons[0].text;
+    liters = todayRainMM * sqm;
+    animateNumber('rainNumber', todayRainMM.toFixed(1) + ' mm · ' + Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, liters, ' L');
+    const comparisons = getComparisons(liters).map(c => c.text);
+    startCardRotation('rain', comparisons);
   }
 
   // SUN card
+  let watts = 0;
   if (currentSolar !== null && currentSolar > 0) {
-    const watts = calculateSolarPotential(currentSolar, sqm);
-    document.getElementById('sunNumber').textContent = watts.toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' W';
-    document.getElementById('sunText').textContent = getSunComparison(watts, t);
+    watts = calculateSolarPotential(currentSolar, sqm);
+    animateNumber('sunNumber', watts.toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' W', true, watts, ' W');
+    startCardRotation('sun', getSunComparisons(watts, t));
   } else {
     document.getElementById('sunNumber').textContent = '0 W';
-    document.getElementById('sunText').textContent = t.noSunText;
+    startCardRotation('sun', [t.noSunText]);
   }
 
   // AIR card
+  let airWater = 0;
   if (currentHumidity !== null && currentTemp !== null) {
-    const airWater = calculateAirWater(currentTemp, currentHumidity, sqm);
-    document.getElementById('airNumber').textContent = Math.round(airWater).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L';
-    document.getElementById('airText').textContent = getAirComparison(airWater, t) + ' (' + currentHumidity + '% ' + t.humidityWord + ')';
+    airWater = calculateAirWater(currentTemp, currentHumidity, sqm);
+    animateNumber('airNumber', Math.round(airWater).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, airWater, ' L');
+    startCardRotation('air', getAirComparisons(airWater, currentHumidity, t));
   } else {
     document.getElementById('airNumber').textContent = '—';
-    document.getElementById('airText').textContent = t.enterArea;
+    startCardRotation('air', [t.enterArea]);
+  }
+
+  updateSkyMood(t);
+  compareToYesterday(todayRainMM, watts, currentHumidity);
+}
+
+function updateSkyMood(t) {
+  const moodEl = document.getElementById('skyMood');
+  if (!moodEl || currentTemp === null) return;
+
+  let mood;
+  if (todayRainMM >= 5) mood = t.moodWet;
+  else if (todayRainMM >= 1) mood = t.moodDrizzly;
+  else if (currentTemp >= 33) mood = t.moodHotDry;
+  else if (currentTemp >= 26 && currentHumidity >= 60) mood = t.moodWarmHumid;
+  else if (currentTemp < 20) mood = t.moodCool;
+  else mood = t.moodMild;
+
+  moodEl.textContent = mood;
+}
+
+function compareToYesterday(rainMM, watts, humidity) {
+  const todayKey = new Date().toISOString().split('T')[0];
+  const stored = JSON.parse(localStorage.getItem('supsky_yesterday') || '{}');
+
+  if (stored.date && stored.date !== todayKey) {
+    const t = translations[currentLang];
+    if (stored.rain !== undefined) {
+      const diff = rainMM - stored.rain;
+      const note = diff > 0.5 ? t.trendUp : (diff < -0.5 ? t.trendDown : t.trendSame);
+      const el = document.getElementById('rainTrend');
+      if (el) el.textContent = note;
+    }
+  }
+
+  if (!stored.date || stored.date !== todayKey) {
+    localStorage.setItem('supsky_yesterday', JSON.stringify({ date: todayKey, rain: rainMM, watts: watts, humidity: humidity }));
   }
 }
 
