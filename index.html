@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MyRain</title>
+<title>MyRainToday</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MyRain">
+<meta name="apple-mobile-web-app-title" content="MyRainToday">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#212B31">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23212B31'/%3E%3Cpath d='M28 55 C18 55 12 47 12 39 C12 30 20 23 29 24 C31 14 40 7 51 7 C63 7 73 16 74 28 C82 29 88 36 88 44 C88 51 82 57 74 57 L28 57 Z' fill='%23E9EEF0'/%3E%3Cpath d='M50 62 C50 62 40 75 40 83 C40 89 45 93 50 93 C55 93 60 89 60 83 C60 75 50 62 50 62 Z' fill='%236FC0D4'/%3E%3C/svg%3E">
@@ -154,6 +154,22 @@
     min-height: 18px;
   }
 
+  .hero.compact {
+    padding: 10px 0 8px;
+  }
+
+  .hero.compact .logo-wrap,
+  .hero.compact .tagline,
+  .hero.compact .check-btn,
+  .hero.compact .status-line {
+    display: none;
+  }
+
+  .hero.compact .brand {
+    font-size: 19px;
+    margin-bottom: 0;
+  }
+
   .result-section {
     display: none;
     flex-direction: column;
@@ -251,6 +267,16 @@
     color: var(--rain-bright);
     text-align: center;
     margin-top: 4px;
+  }
+
+  .safety-note {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--mist);
   }
 
   .area-row {
@@ -424,7 +450,7 @@
         </g>
       </svg>
     </div>
-    <div class="brand"><span id="brand-my">My</span><span class="rain-part" id="brand-rain">Rain</span></div>
+    <div class="brand"><span id="brand-my">My</span><span class="rain-part" id="brand-rain">Rain</span><span id="brand-today">Today</span></div>
     <div class="tagline" id="tagline">Find out exactly how much rain fell on your roof today — in real liters.</div>
 
     <button class="check-btn" id="checkBtn" onclick="checkRain()">
@@ -439,6 +465,8 @@
       <div class="mm-number" id="mmNumber">0</div>
       <div class="mm-label" id="mmLabel">mm of rain today</div>
     </div>
+
+    <div class="safety-note" id="safetyNote" style="display:none;"></div>
 
     <div class="area-card">
       <div class="mode-toggle">
@@ -492,6 +520,8 @@
 let currentLang = 'en';
 let currentMode = 'roof';
 let todayRainMM = 0;
+let currentTemp = null;
+let currentWind = null;
 let compareIndex = 0;
 let compareInterval = null;
 let locationName = '';
@@ -499,8 +529,8 @@ let hasLocation = false;
 
 const translations = {
   en: {
-    tagline: "Find out exactly how much rain fell on your roof today — in real liters.",
-    taglineFarm: "Find out exactly how much rain fell on your land today — in real liters.",
+    tagline: "Find out how much rain fell on your roof today — in real liters.",
+    taglineFarm: "Find out how much rain fell on your land today — in real liters.",
     btnText: "Check My Rain",
     btnTextLoading: "Checking the sky…",
     locLabel: "Your location",
@@ -515,6 +545,11 @@ const translations = {
     lightRainCaption: "It was a light drizzle today — small in depth, but still real water on the ground.",
     noRainCaption: "No measurable rain fell at your location today.",
     noRainCompare: "Check back after it rains to see what that water could do.",
+    safetyStormy: "🌬️ Winds are strong right now — this feels more like a storm than gentle rain. Best to stay indoors.",
+    safetyCold: "🥶 It's quite cool today — getting wet in this could feel chilly fast. Young kids, elderly, or anyone unwell may want to avoid it.",
+    safetyCool: "🌦️ Mild temperature — a short time in this rain is generally fine for most people, but don't linger too long.",
+    safetyPleasant: "☔ Comfortable temperature — a nice time to enjoy the rain briefly if you'd like.",
+    safetyWarm: "🌡️ It's warm out — rain right now should feel refreshing for most people.",
     resetBtn: "Check a different location",
     footerNote: "Rainfall data from Open-Meteo, based on your GPS location.<br>Water comparisons based on Ministry of Housing & Urban Affairs (India) domestic usage standards (135 L/person/day).",
     enterArea: "Enter your area to see what this water could do.",
@@ -547,6 +582,11 @@ const translations = {
     lightRainCaption: "आज हल्की बूंदाबांदी हुई — मात्रा कम है, पर ज़मीन पर पानी असली है।",
     noRainCaption: "आज आपके स्थान पर मापने लायक बारिश नहीं हुई।",
     noRainCompare: "बारिश होने के बाद दोबारा देखें कि वह पानी क्या कर सकता है।",
+    safetyStormy: "🌬️ अभी तेज़ हवा चल रही है — यह हल्की बारिश से ज़्यादा तूफ़ान जैसा लग रहा है। घर के अंदर रहना बेहतर होगा।",
+    safetyCold: "🥶 आज काफी ठंड है — इसमें भीगना जल्दी ठंडक महसूस करा सकता है। छोटे बच्चे, बुज़ुर्ग, या बीमार लोग इससे बचें तो अच्छा है।",
+    safetyCool: "🌦️ हल्का तापमान है — ज़्यादातर लोगों के लिए थोड़ी देर बारिश में रहना ठीक है, पर ज़्यादा देर न रुकें।",
+    safetyPleasant: "☔ आरामदायक तापमान है — थोड़ी देर बारिश का आनंद लेने का अच्छा समय है।",
+    safetyWarm: "🌡️ बाहर गर्मी है — अभी बारिश ज़्यादातर लोगों को ताज़गी देगी।",
     resetBtn: "दूसरी जगह देखें",
     footerNote: "बारिश का डेटा Open-Meteo से, आपके GPS स्थान के आधार पर।<br>पानी तुलना भारत सरकार आवासन एवं शहरी कार्य मंत्रालय के मानकों पर आधारित (135 लीटर/व्यक्ति/दिन)।",
     enterArea: "यह पानी क्या कर सकता है, जानने के लिए क्षेत्रफल डालें।",
@@ -653,6 +693,22 @@ function setMode(mode) {
   document.getElementById('areaFieldLabel').textContent = mode === 'roof' ? t.areaFieldLabelRoof : t.areaFieldLabelFarm;
   document.getElementById('litersLabel').textContent = mode === 'roof' ? t.litersLabelRoof : t.litersLabelFarm;
   document.getElementById('tagline').innerHTML = mode === 'roof' ? t.tagline : t.taglineFarm;
+
+  const unitSelect = document.getElementById('unitSelect');
+  const acreOpt = unitSelect.querySelector('option[value="acre"]');
+  const bighaOpt = unitSelect.querySelector('option[value="bigha"]');
+  if (mode === 'roof') {
+    acreOpt.style.display = 'none';
+    bighaOpt.style.display = 'none';
+    if (unitSelect.value === 'acre' || unitSelect.value === 'bigha') {
+      unitSelect.value = 'sqft';
+      document.getElementById('bighaNote').classList.remove('visible');
+    }
+  } else {
+    acreOpt.style.display = '';
+    bighaOpt.style.display = '';
+  }
+
   if (document.getElementById('areaInput').value) {
     calculate();
   }
@@ -685,10 +741,12 @@ async function checkRain() {
     const lon = pos.coords.longitude;
 
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&timezone=auto`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&current=temperature_2m,wind_speed_10m&timezone=auto`;
       const res = await fetch(url);
       const data = await res.json();
       todayRainMM = data.daily.precipitation_sum[0] || 0;
+      currentTemp = data.current ? data.current.temperature_2m : null;
+      currentWind = data.current ? data.current.wind_speed_10m : null;
 
       let geoName = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
       try {
@@ -724,6 +782,16 @@ async function checkRain() {
       hasLocation = true;
       document.getElementById('mmNumber').textContent = todayRainMM.toFixed(1);
       document.getElementById('resultSection').classList.add('visible');
+      document.querySelector('.hero').classList.add('compact');
+
+      const safetyMsg = getSafetyNote();
+      const safetyEl = document.getElementById('safetyNote');
+      if (safetyMsg) {
+        safetyEl.textContent = safetyMsg;
+        safetyEl.style.display = 'block';
+      } else {
+        safetyEl.style.display = 'none';
+      }
 
       calculate();
 
@@ -754,6 +822,25 @@ function areaToSqm(value, unit) {
     return value * bighaValues[region];
   }
   return value;
+}
+
+function getSafetyNote() {
+  const t = translations[currentLang];
+  if (currentTemp === null || todayRainMM < 0.1) return '';
+
+  if (currentWind !== null && currentWind > 30) {
+    return t.safetyStormy;
+  }
+  if (currentTemp < 15) {
+    return t.safetyCold;
+  }
+  if (currentTemp >= 15 && currentTemp < 22) {
+    return t.safetyCool;
+  }
+  if (currentTemp >= 22 && currentTemp < 32) {
+    return t.safetyPleasant;
+  }
+  return t.safetyWarm;
 }
 
 function calculate() {
@@ -835,12 +922,14 @@ function renderCompare(liters) {
 
 function resetApp() {
   document.getElementById('resultSection').classList.remove('visible');
+  document.querySelector('.hero').classList.remove('compact');
   document.getElementById('areaInput').value = '';
   stopCompareRotation();
   document.getElementById('statusLine').textContent = '';
 }
 
 setLang('en');
+setMode('roof');
 </script>
 
 </body>
