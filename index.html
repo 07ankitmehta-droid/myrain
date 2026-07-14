@@ -656,14 +656,14 @@ function getComparisons(liters) {
 
   const en = [
     { icon: "🚿", text: (days) => `That's enough for ${days} day${days == 1 ? '' : 's'} of an average city person's total daily water use (135 L/day).` },
-    { icon: "🪣", text: (baths) => `Enough for about ${baths} bucket bath${baths == 1 ? '' : 's'} (55 L each).` },
+    { icon: "🪣", text: (baths) => `Enough for about ${baths} full bathing session${baths == 1 ? '' : 's'} worth of water (55 L each, the standard daily bathing allocation).` },
     { icon: "🚽", text: (flushes) => `That's around ${flushes} toilet flushes worth of water (10 L each).` },
     { icon: "👕", text: (loads) => `Enough for roughly ${loads} load${loads == 1 ? '' : 's'} of hand-washing clothes (20 L each).` },
     { icon: "💧", text: (drinkDays) => `That's ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person (5 L/day).` }
   ];
   const hi = [
     { icon: "🚿", text: (days) => `यह एक शहरी व्यक्ति के ${days} दिन के पूरे पानी उपयोग (135 लीटर/दिन) जितना है।` },
-    { icon: "🪣", text: (baths) => `लगभग ${baths} बाल्टी नहाने ​जितना (हर बाल्टी 55 लीटर)।` },
+    { icon: "🪣", text: (baths) => `लगभग ${baths} पूरे नहाने ​जितना पानी (हर एक 55 लीटर, रोज़ाना नहाने की मानक मात्रा)।` },
     { icon: "🚽", text: (flushes) => `करीब ${flushes} बार टॉयलेट फ्लश जितना (हर बार 10 लीटर)।` },
     { icon: "👕", text: (loads) => `लगभग ${loads} बार कपड़े धोने जितना (हर बार 20 लीटर)।` },
     { icon: "💧", text: (drinkDays) => `एक व्यक्ति के ${drinkDays} दिन के पीने के पानी जितना (5 लीटर/दिन)।` }
@@ -786,10 +786,18 @@ async function checkRain() {
     const lon = pos.coords.longitude;
 
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&current=temperature_2m,wind_speed_10m&timezone=auto`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=precipitation&current=temperature_2m,wind_speed_10m&timezone=auto&forecast_days=1`;
       const res = await fetch(url);
       const data = await res.json();
-      todayRainMM = data.daily.precipitation_sum[0] || 0;
+
+      const nowHour = new Date().getHours();
+      let rainSoFar = 0;
+      for (let h = 0; h <= nowHour; h++) {
+        if (data.hourly && data.hourly.precipitation && data.hourly.precipitation[h] !== undefined) {
+          rainSoFar += data.hourly.precipitation[h];
+        }
+      }
+      todayRainMM = Math.round(rainSoFar * 10) / 10;
       currentTemp = data.current ? data.current.temperature_2m : null;
       currentWind = data.current ? data.current.wind_speed_10m : null;
 
