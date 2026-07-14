@@ -451,28 +451,6 @@
     gap: 12px;
   }
 
-  .sky-card-pair {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .sky-card-pair .sky-card {
-    padding: 14px 12px;
-  }
-
-  .sky-card-pair .sky-card-header {
-    font-size: 12.5px;
-    margin-bottom: 6px;
-  }
-
-  .sky-card-pair .sky-card-icon { width: 18px; height: 18px; }
-
-  .sky-card-pair .sky-card-number {
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-
   .sky-card-fact {
     display: flex;
     align-items: center;
@@ -490,20 +468,11 @@
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5)) drop-shadow(0 0 1px rgba(0,0,0,0.4));
   }
 
-  .sky-card-pair .fact-icon-big {
-    width: 32px;
-    height: 32px;
-  }
-
   .sky-card-text {
     font-size: 13.5px;
     line-height: 1.45;
     color: var(--mist);
     transition: opacity 0.4s ease;
-  }
-
-  .sky-card-pair .sky-card-text {
-    font-size: 12px;
   }
 
   .details-toggle {
@@ -711,28 +680,26 @@
         <div class="sky-card-details" id="rainDetails" style="display:none;"></div>
       </div>
 
-      <div class="sky-card-pair">
-        <div class="sky-card" id="sunSkyCard">
-          <div class="sky-card-header"><img class="sky-card-icon" id="sunHeaderIcon" src=""><span id="sunHeader">Sun</span></div>
-          <div class="sky-card-number" id="sunNumber">0 W</div>
-          <div class="sky-card-fact">
-            <img class="fact-icon-big" id="sunFactIcon" src="">
-            <span class="sky-card-text" id="sunFactText">—</span>
-          </div>
-          <button class="details-toggle" onclick="toggleDetails('sun')"><span id="sunToggleLabel">Details</span> ▾</button>
-          <div class="sky-card-details" id="sunDetails" style="display:none;"></div>
+      <div class="sky-card" id="sunSkyCard">
+        <div class="sky-card-header"><img class="sky-card-icon" id="sunHeaderIcon" src=""><span id="sunHeader">Sun</span></div>
+        <div class="sky-card-number" id="sunNumber">0 W</div>
+        <div class="sky-card-fact">
+          <img class="fact-icon-big" id="sunFactIcon" src="">
+          <span class="sky-card-text" id="sunFactText">—</span>
         </div>
+        <button class="details-toggle" onclick="toggleDetails('sun')"><span id="sunToggleLabel">Details</span> ▾</button>
+        <div class="sky-card-details" id="sunDetails" style="display:none;"></div>
+      </div>
 
-        <div class="sky-card" id="airSkyCard">
-          <div class="sky-card-header"><img class="sky-card-icon" id="airHeaderIcon" src=""><span id="airHeader">Moisture</span></div>
-          <div class="sky-card-number" id="airNumber">0 L</div>
-          <div class="sky-card-fact">
-            <img class="fact-icon-big" id="airFactIcon" src="">
-            <span class="sky-card-text" id="airFactText">—</span>
-          </div>
-          <button class="details-toggle" onclick="toggleDetails('air')"><span id="airToggleLabel">Details</span> ▾</button>
-          <div class="sky-card-details" id="airDetails" style="display:none;"></div>
+      <div class="sky-card" id="airSkyCard">
+        <div class="sky-card-header"><img class="sky-card-icon" id="airHeaderIcon" src=""><span id="airHeader">Moisture</span></div>
+        <div class="sky-card-number" id="airNumber">0 L</div>
+        <div class="sky-card-fact">
+          <img class="fact-icon-big" id="airFactIcon" src="">
+          <span class="sky-card-text" id="airFactText">—</span>
         </div>
+        <button class="details-toggle" onclick="toggleDetails('air')"><span id="airToggleLabel">Details</span> ▾</button>
+        <div class="sky-card-details" id="airDetails" style="display:none;"></div>
       </div>
     </div>
 
@@ -1394,10 +1361,9 @@ function calculate() {
 function reorderCards(liters, watts, airWater) {
   const container = document.getElementById('skyCardsContainer');
   const rainCard = document.getElementById('rainSkyCard');
-  const pair = document.querySelector('.sky-card-pair');
 
   if (todayRainMM >= 1) {
-    container.insertBefore(rainCard, pair);
+    container.insertBefore(rainCard, container.firstChild);
   } else {
     container.appendChild(rainCard);
   }
