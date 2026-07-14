@@ -436,24 +436,78 @@
     margin-bottom: 6px;
   }
 
-  .sky-card-fact {
+  .sky-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sky-card-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .sky-card-pair .sky-card {
+    padding: 14px 12px;
+  }
+
+  .sky-card-pair .sky-card-header {
+    font-size: 12.5px;
+    margin-bottom: 6px;
+  }
+
+  .sky-card-pair .sky-card-icon { font-size: 17px; }
+
+  .sky-card-pair .sky-card-number {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .sky-card-short {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--mist);
+    margin-bottom: 8px;
+  }
+
+  .sky-card-pair .sky-card-short {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .details-toggle {
+    background: none;
+    border: none;
+    color: var(--rain-bright);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+  }
+
+  .sky-card-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--card-line);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .detail-fact {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--mist-dim);
   }
 
-  .fact-icon {
-    font-size: 24px;
+  .detail-fact .fact-icon {
+    font-size: 16px;
     flex-shrink: 0;
-    line-height: 1.4;
-  }
-
-  .sky-card-text {
-    font-size: 14px;
-    line-height: 1.55;
-    color: var(--mist);
-    transition: opacity 0.4s ease;
-    font-weight: 500;
   }
 
   .compare-card {
@@ -607,30 +661,31 @@
     <div class="sky-mood" id="skyMood"></div>
     <div class="sky-report-title" id="skyReportTitle">Today's Sky Report</div>
 
-    <div class="sky-card" id="rainSkyCard">
-      <div class="sky-card-header"><span class="sky-card-icon">🌧️</span><span id="rainHeader">Rain</span><span class="trend-badge" id="rainTrend"></span></div>
-      <div class="sky-card-number" id="rainNumber">0 mm</div>
-      <div class="sky-card-fact">
-        <span class="fact-icon" id="rainFactIcon">🚿</span>
-        <span class="sky-card-text" id="rainText">—</span>
+    <div class="sky-cards-container" id="skyCardsContainer">
+      <div class="sky-card sky-card-full" id="rainSkyCard">
+        <div class="sky-card-header"><span class="sky-card-icon">🌧️</span><span id="rainHeader">Rain</span><span class="trend-badge" id="rainTrend"></span></div>
+        <div class="sky-card-number" id="rainNumber">0 mm</div>
+        <div class="sky-card-short" id="rainShort">≈ —</div>
+        <button class="details-toggle" onclick="toggleDetails('rain')"><span id="rainToggleLabel">Details</span> ▾</button>
+        <div class="sky-card-details" id="rainDetails" style="display:none;"></div>
       </div>
-    </div>
 
-    <div class="sky-card" id="sunSkyCard">
-      <div class="sky-card-header"><span class="sky-card-icon">☀️</span><span id="sunHeader">Sun</span></div>
-      <div class="sky-card-number" id="sunNumber">0 W</div>
-      <div class="sky-card-fact">
-        <span class="fact-icon" id="sunFactIcon">⚡</span>
-        <span class="sky-card-text" id="sunText">—</span>
-      </div>
-    </div>
+      <div class="sky-card-pair">
+        <div class="sky-card" id="sunSkyCard">
+          <div class="sky-card-header"><span class="sky-card-icon">☀️</span><span id="sunHeader">Sun</span></div>
+          <div class="sky-card-number" id="sunNumber">0 W</div>
+          <div class="sky-card-short" id="sunShort">≈ —</div>
+          <button class="details-toggle" onclick="toggleDetails('sun')"><span id="sunToggleLabel">Details</span> ▾</button>
+          <div class="sky-card-details" id="sunDetails" style="display:none;"></div>
+        </div>
 
-    <div class="sky-card" id="airSkyCard">
-      <div class="sky-card-header"><span class="sky-card-icon">💦</span><span id="airHeader">Moisture</span></div>
-      <div class="sky-card-number" id="airNumber">0 L</div>
-      <div class="sky-card-fact">
-        <span class="fact-icon" id="airFactIcon">💦</span>
-        <span class="sky-card-text" id="airText">—</span>
+        <div class="sky-card" id="airSkyCard">
+          <div class="sky-card-header"><span class="sky-card-icon">💦</span><span id="airHeader">Moisture</span></div>
+          <div class="sky-card-number" id="airNumber">0 L</div>
+          <div class="sky-card-short" id="airShort">≈ —</div>
+          <button class="details-toggle" onclick="toggleDetails('air')"><span id="airToggleLabel">Details</span> ▾</button>
+          <div class="sky-card-details" id="airDetails" style="display:none;"></div>
+        </div>
       </div>
     </div>
 
@@ -665,7 +720,7 @@ const translations = {
     locLabel: "Your location",
     skyReportTitle: "Today's Sky Report",
     sunHeader: "Sun",
-    airHeader: "Air",
+    airHeader: "Moisture",
     mmLabel: "mm of rain today",
     areaFieldLabelRoof: "Your roof / house area",
     areaFieldLabelFarm: "Your farm / land area",
@@ -685,6 +740,8 @@ const translations = {
     airDrinkDays: (liters, days) => `That's roughly ${days} day${days == 1 ? '' : 's'} of drinking water for one person, if this vapor could be condensed.`,
     noSunText: "No usable sunlight detected right now — try again during daylight hours.",
     humidityWord: "humidity",
+    showDetails: "Details",
+    hideDetails: "Hide",
     moodWet: "Wet & Heavy 🌧️",
     moodDrizzly: "Light & Drizzly 🌦️",
     moodHotDry: "Hot & Dry ☀️",
@@ -737,7 +794,7 @@ const translations = {
     locLabel: "आपका स्थान",
     skyReportTitle: "आज की आसमान रिपोर्ट",
     sunHeader: "धूप",
-    airHeader: "हवा",
+    airHeader: "नमी",
     mmLabel: "मिमी बारिश आज",
     areaFieldLabelRoof: "आपकी छत / घर का क्षेत्रफल",
     areaFieldLabelFarm: "आपकी खेत / ज़मीन का क्षेत्रफल",
@@ -757,6 +814,8 @@ const translations = {
     airDrinkDays: (liters, days) => `यह लगभग ${days} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह भाप पानी में बदल पाए।`,
     noSunText: "अभी उपयोगी धूप नहीं मिली — दिन के समय दोबारा कोशिश करें।",
     humidityWord: "नमी",
+    showDetails: "विवरण",
+    hideDetails: "छुपाएं",
     moodWet: "भीगा और भारी 🌧️",
     moodDrizzly: "हल्की बूंदाबांदी 🌦️",
     moodHotDry: "गर्म और सूखा ☀️",
@@ -803,38 +862,28 @@ const translations = {
   }
 };
 
-const cardRotations = {};
+const detailsOpen = {};
 
-function startCardRotation(cardKey, items) {
-  if (cardRotations[cardKey]) clearInterval(cardRotations[cardKey].interval);
-  let index = 0;
-  const textEl = document.getElementById(cardKey + 'Text');
-  const iconEl = document.getElementById(cardKey + 'FactIcon');
-
-  const render = () => {
-    const item = items[index];
+function renderDetailsList(cardKey, items) {
+  const detailsEl = document.getElementById(cardKey + 'Details');
+  detailsEl.innerHTML = '';
+  items.forEach(item => {
     const itemText = typeof item === 'string' ? item : item.text;
-    const itemIcon = typeof item === 'string' ? null : item.icon;
-    textEl.style.opacity = '0';
-    if (iconEl) iconEl.style.opacity = '0';
-    setTimeout(() => {
-      textEl.textContent = itemText;
-      if (iconEl && itemIcon) iconEl.textContent = itemIcon;
-      textEl.style.opacity = '1';
-      if (iconEl) iconEl.style.opacity = '1';
-    }, 200);
-  };
-  render();
+    const itemIcon = typeof item === 'string' ? '•' : item.icon;
+    const row = document.createElement('div');
+    row.className = 'detail-fact';
+    row.innerHTML = '<span class="fact-icon">' + itemIcon + '</span><span>' + itemText + '</span>';
+    detailsEl.appendChild(row);
+  });
+}
 
-  if (items.length > 1) {
-    const interval = setInterval(() => {
-      index = (index + 1) % items.length;
-      render();
-    }, 5800);
-    cardRotations[cardKey] = { interval };
-  } else {
-    cardRotations[cardKey] = { interval: null };
-  }
+function toggleDetails(cardKey) {
+  const detailsEl = document.getElementById(cardKey + 'Details');
+  const labelEl = document.getElementById(cardKey + 'ToggleLabel');
+  const t = translations[currentLang];
+  detailsOpen[cardKey] = !detailsOpen[cardKey];
+  detailsEl.style.display = detailsOpen[cardKey] ? 'flex' : 'none';
+  labelEl.textContent = detailsOpen[cardKey] ? t.hideDetails : t.showDetails;
 }
 
 function getSunComparisons(watts, t) {
@@ -1167,11 +1216,11 @@ function calculate() {
 
   if (!areaVal || areaVal <= 0) {
     document.getElementById('rainNumber').textContent = '—';
-    document.getElementById('rainText').textContent = t.enterArea;
+    document.getElementById('rainShort').textContent = t.enterArea;
     document.getElementById('sunNumber').textContent = '—';
-    document.getElementById('sunText').textContent = t.enterArea;
+    document.getElementById('sunShort').textContent = t.enterArea;
     document.getElementById('airNumber').textContent = '—';
-    document.getElementById('airText').textContent = t.enterArea;
+    document.getElementById('airShort').textContent = t.enterArea;
     return;
   }
 
@@ -1190,12 +1239,15 @@ function calculate() {
   let liters = 0;
   if (todayRainMM < 1) {
     document.getElementById('rainNumber').textContent = '0 mm';
-    startCardRotation('rain', [{icon: '⛅', text: t.noRainCaption}]);
+    document.getElementById('rainShort').textContent = t.noRainCaption;
+    renderDetailsList('rain', [{icon: '⛅', text: t.noRainCaption}]);
   } else {
     liters = todayRainMM * sqm;
     animateNumber('rainNumber', todayRainMM.toFixed(1) + ' mm · ' + Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, liters, ' L');
+    const buckets15L = Math.max(1, Math.round(liters / 15));
+    document.getElementById('rainShort').textContent = '🪣 ≈ ' + buckets15L + (currentLang === 'hi' ? ' बाल्टी (15L)' : ' buckets (15L)');
     const comparisons = getComparisons(liters);
-    startCardRotation('rain', comparisons);
+    renderDetailsList('rain', comparisons);
   }
 
   // SUN card
@@ -1203,10 +1255,13 @@ function calculate() {
   if (currentSolar !== null && currentSolar > 0) {
     watts = calculateSolarPotential(currentSolar, sqm);
     animateNumber('sunNumber', watts.toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' W', true, watts, ' W');
-    startCardRotation('sun', getSunComparisons(watts, t));
+    const fans = Math.max(1, Math.round(watts / 60));
+    document.getElementById('sunShort').textContent = '🌀 ≈ ' + fans + (currentLang === 'hi' ? ' पंखे (60W)' : ' fans (60W)');
+    renderDetailsList('sun', getSunComparisons(watts, t));
   } else {
     document.getElementById('sunNumber').textContent = '0 W';
-    startCardRotation('sun', [{icon: '🌑', text: t.noSunText}]);
+    document.getElementById('sunShort').textContent = t.noSunText;
+    renderDetailsList('sun', [{icon: '🌑', text: t.noSunText}]);
   }
 
   // AIR card
@@ -1214,14 +1269,30 @@ function calculate() {
   if (currentHumidity !== null && currentTemp !== null) {
     airWater = calculateAirWater(currentTemp, currentHumidity, sqm);
     animateNumber('airNumber', Math.round(airWater).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, airWater, ' L');
-    startCardRotation('air', getAirComparisons(airWater, currentHumidity, t));
+    const bottles = Math.max(1, Math.round(airWater / 1));
+    document.getElementById('airShort').textContent = '🍶 ≈ ' + bottles + (currentLang === 'hi' ? ' बोतलें (1L)' : ' bottles (1L)');
+    renderDetailsList('air', getAirComparisons(airWater, currentHumidity, t));
   } else {
     document.getElementById('airNumber').textContent = '—';
-    startCardRotation('air', [t.enterArea]);
+    document.getElementById('airShort').textContent = t.enterArea;
+    renderDetailsList('air', [t.enterArea]);
   }
 
   updateSkyMood(t);
   compareToYesterday(todayRainMM, watts, currentHumidity);
+  reorderCards(liters, watts, airWater);
+}
+
+function reorderCards(liters, watts, airWater) {
+  const container = document.getElementById('skyCardsContainer');
+  const rainCard = document.getElementById('rainSkyCard');
+  const pair = document.querySelector('.sky-card-pair');
+
+  if (todayRainMM >= 1) {
+    container.insertBefore(rainCard, pair);
+  } else {
+    container.appendChild(rainCard);
+  }
 }
 
 function updateSkyMood(t) {
