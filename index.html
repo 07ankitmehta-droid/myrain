@@ -239,8 +239,8 @@
   .area-card {
     background: var(--card);
     border: 1px solid var(--card-line);
-    border-radius: 18px;
-    padding: 20px;
+    border-radius: 16px;
+    padding: 12px 16px;
   }
 
   .field-label {
@@ -254,7 +254,7 @@
   .mode-toggle {
     display: flex;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .mode-btn {
@@ -464,16 +464,34 @@
     margin-bottom: 4px;
   }
 
-  .sky-card-short {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--mist);
-    margin-bottom: 8px;
+  .sky-card-fact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    min-height: 48px;
   }
 
-  .sky-card-pair .sky-card-short {
-    font-size: 13px;
-    margin-bottom: 6px;
+  .fact-icon-big {
+    font-size: 40px;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .sky-card-pair .fact-icon-big {
+    font-size: 30px;
+  }
+
+  .sky-card-text {
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--mist);
+    transition: opacity 0.4s ease;
+  }
+
+  .sky-card-pair .sky-card-text {
+    font-size: 12px;
   }
 
   .details-toggle {
@@ -658,14 +676,17 @@
       </div>
     </div>
 
-    <div class="sky-mood" id="skyMood"></div>
     <div class="sky-report-title" id="skyReportTitle">Today's Sky Report</div>
+    <div class="sky-mood" id="skyMood"></div>
 
     <div class="sky-cards-container" id="skyCardsContainer">
       <div class="sky-card sky-card-full" id="rainSkyCard">
         <div class="sky-card-header"><span class="sky-card-icon">🌧️</span><span id="rainHeader">Rain</span><span class="trend-badge" id="rainTrend"></span></div>
         <div class="sky-card-number" id="rainNumber">0 mm</div>
-        <div class="sky-card-short" id="rainShort">≈ —</div>
+        <div class="sky-card-fact">
+          <span class="fact-icon-big" id="rainFactIcon">🚿</span>
+          <span class="sky-card-text" id="rainFactText">—</span>
+        </div>
         <button class="details-toggle" onclick="toggleDetails('rain')"><span id="rainToggleLabel">Details</span> ▾</button>
         <div class="sky-card-details" id="rainDetails" style="display:none;"></div>
       </div>
@@ -674,7 +695,10 @@
         <div class="sky-card" id="sunSkyCard">
           <div class="sky-card-header"><span class="sky-card-icon">☀️</span><span id="sunHeader">Sun</span></div>
           <div class="sky-card-number" id="sunNumber">0 W</div>
-          <div class="sky-card-short" id="sunShort">≈ —</div>
+          <div class="sky-card-fact">
+            <span class="fact-icon-big" id="sunFactIcon">⚡</span>
+            <span class="sky-card-text" id="sunFactText">—</span>
+          </div>
           <button class="details-toggle" onclick="toggleDetails('sun')"><span id="sunToggleLabel">Details</span> ▾</button>
           <div class="sky-card-details" id="sunDetails" style="display:none;"></div>
         </div>
@@ -682,7 +706,10 @@
         <div class="sky-card" id="airSkyCard">
           <div class="sky-card-header"><span class="sky-card-icon">💦</span><span id="airHeader">Moisture</span></div>
           <div class="sky-card-number" id="airNumber">0 L</div>
-          <div class="sky-card-short" id="airShort">≈ —</div>
+          <div class="sky-card-fact">
+            <span class="fact-icon-big" id="airFactIcon">💦</span>
+            <span class="sky-card-text" id="airFactText">—</span>
+          </div>
           <button class="details-toggle" onclick="toggleDetails('air')"><span id="airToggleLabel">Details</span> ▾</button>
           <div class="sky-card-details" id="airDetails" style="display:none;"></div>
         </div>
@@ -762,7 +789,7 @@ const translations = {
       { icon: '💦', text: `The air around your land is holding real moisture — about ${liters} L worth, at ${humidity}% humidity.` },
       { icon: '🥤', text: `That's roughly ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person, if it could be condensed.` },
       { icon: '🍶', text: `Or about ${bottles} standard 1L water bottle${bottles == 1 ? '' : 's'} worth.` },
-      { icon: '🚿', text: `Enough, in theory, for about ${showerMins} minute${showerMins == 1 ? '' : 's'} of a shower (9L/min).` },
+      { icon: '🛀', text: `Enough, in theory, for about ${showerMins} minute${showerMins == 1 ? '' : 's'} of a shower (9L/min).` },
       { icon: '🌫️', text: `This water isn't extractable at home — but it's genuinely there, all around you, right now.` }
     ],
     solarFact: (watts) => `No rain, but real sunlight is hitting your roof right now — enough to generate roughly ${watts} watts if you had solar panels there.`,
@@ -836,7 +863,7 @@ const translations = {
       { icon: '💦', text: `आपकी ज़मीन के आस-पास की हवा में असली नमी है — लगभग ${liters} लीटर, ${humidity}% नमी पर।` },
       { icon: '🥤', text: `यह लगभग ${drinkDays} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह पानी में बदल पाए।` },
       { icon: '🍶', text: `या लगभग ${bottles} लीटर की पानी की बोतलों जितना।` },
-      { icon: '🚿', text: `सैद्धांतिक रूप से, लगभग ${showerMins} मिनट के शावर जितना (9 लीटर/मिनट)।` },
+      { icon: '🛀', text: `सैद्धांतिक रूप से, लगभग ${showerMins} मिनट के शावर जितना (9 लीटर/मिनट)।` },
       { icon: '🌫️', text: `यह पानी घर पर निकाला नहीं जा सकता — पर यह सच में, अभी आपके चारों ओर मौजूद है।` }
     ],
     solarFact: (watts) => `बारिश नहीं है, पर अभी आपकी छत पर असली धूप पड़ रही है — अगर वहाँ सोलर पैनल होते, तो लगभग ${watts} वाट बिजली बन सकती थी।`,
@@ -863,6 +890,36 @@ const translations = {
 };
 
 const detailsOpen = {};
+const cardRotations = {};
+
+function startCardRotation(cardKey, items) {
+  if (cardRotations[cardKey]) clearInterval(cardRotations[cardKey]);
+  let index = 0;
+  const textEl = document.getElementById(cardKey + 'FactText');
+  const iconEl = document.getElementById(cardKey + 'FactIcon');
+
+  const render = () => {
+    const item = items[index];
+    const itemText = typeof item === 'string' ? item : item.text;
+    const itemIcon = typeof item === 'string' ? null : item.icon;
+    textEl.style.opacity = '0';
+    iconEl.style.opacity = '0';
+    setTimeout(() => {
+      textEl.textContent = itemText;
+      if (itemIcon) iconEl.textContent = itemIcon;
+      textEl.style.opacity = '1';
+      iconEl.style.opacity = '1';
+    }, 250);
+  };
+  render();
+
+  if (items.length > 1) {
+    cardRotations[cardKey] = setInterval(() => {
+      index = (index + 1) % items.length;
+      render();
+    }, 5000);
+  }
+}
 
 function renderDetailsList(cardKey, items) {
   const detailsEl = document.getElementById(cardKey + 'Details');
@@ -908,14 +965,14 @@ function getComparisons(liters) {
       { icon: "🌾", text: (sqm) => `That's enough to give roughly ${sqm} m² of crop a full day's watering (at ~4L/m²/day).` },
       { icon: "🐄", text: (cattle) => `Enough drinking water for about ${cattle} cattle for a day (~40 L each).` },
       { icon: "🪣", text: (buckets) => `That's about ${buckets} buckets (15 L each) of water for farm use.` },
-      { icon: "💧", text: (days) => `Enough for ${days} day${days == 1 ? '' : 's'} of drinking water for a family of 5 (135 L/day total).` },
+      { icon: "🥛", text: (days) => `Enough for ${days} day${days == 1 ? '' : 's'} of drinking water for a family of 5 (135 L/day total).` },
       { icon: "🚜", text: (hours) => `Roughly equal to ${hours} hour${hours == 1 ? '' : 's'} of a small irrigation pump running (~2000 L/hour).` }
     ];
     const hiFarm = [
       { icon: "🌾", text: (sqm) => `यह लगभग ${sqm} वर्ग मीटर फसल की एक दिन की सिंचाई जितना है (~4 लीटर/वर्ग मीटर/दिन)।` },
       { icon: "🐄", text: (cattle) => `लगभग ${cattle} पशुओं के एक दिन के पीने के पानी जितना (हर एक ~40 लीटर)।` },
       { icon: "🪣", text: (buckets) => `करीब ${buckets} बाल्टी (हर एक 15 लीटर) पानी जितना।` },
-      { icon: "💧", text: (days) => `5 लोगों के परिवार के ${days} दिन के पीने के पानी जितना (135 लीटर/दिन)।` },
+      { icon: "🥛", text: (days) => `5 लोगों के परिवार के ${days} दिन के पीने के पानी जितना (135 लीटर/दिन)।` },
       { icon: "🚜", text: (hours) => `लगभग एक छोटे सिंचाई पंप के ${hours} घंटे चलने जितना (~2000 लीटर/घंटा)।` }
     ];
     const set = currentLang === 'hi' ? hiFarm : enFarm;
@@ -933,14 +990,14 @@ function getComparisons(liters) {
     { icon: "🪣", text: (baths) => `Enough for about ${baths} full bathing session${baths == 1 ? '' : 's'} worth of water (55 L each, the standard daily bathing allocation).` },
     { icon: "🚽", text: (flushes) => `That's around ${flushes} toilet flushes worth of water (10 L each).` },
     { icon: "👕", text: (loads) => `Enough for roughly ${loads} load${loads == 1 ? '' : 's'} of hand-washing clothes (20 L each).` },
-    { icon: "💧", text: (drinkDays) => `That's ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person (5 L/day).` }
+    { icon: "🥛", text: (drinkDays) => `That's ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person (5 L/day).` }
   ];
   const hi = [
     { icon: "🚿", text: (days) => `यह एक शहरी व्यक्ति के ${days} दिन के पूरे पानी उपयोग (135 लीटर/दिन) जितना है।` },
     { icon: "🪣", text: (baths) => `लगभग ${baths} पूरे नहाने ​जितना पानी (हर एक 55 लीटर, रोज़ाना नहाने की मानक मात्रा)।` },
     { icon: "🚽", text: (flushes) => `करीब ${flushes} बार टॉयलेट फ्लश जितना (हर बार 10 लीटर)।` },
     { icon: "👕", text: (loads) => `लगभग ${loads} बार कपड़े धोने जितना (हर बार 20 लीटर)।` },
-    { icon: "💧", text: (drinkDays) => `एक व्यक्ति के ${drinkDays} दिन के पीने के पानी जितना (5 लीटर/दिन)।` }
+    { icon: "🥛", text: (drinkDays) => `एक व्यक्ति के ${drinkDays} दिन के पीने के पानी जितना (5 लीटर/दिन)।` }
   ];
   const set = currentLang === 'hi' ? hi : en;
   return [
@@ -1216,11 +1273,11 @@ function calculate() {
 
   if (!areaVal || areaVal <= 0) {
     document.getElementById('rainNumber').textContent = '—';
-    document.getElementById('rainShort').textContent = t.enterArea;
     document.getElementById('sunNumber').textContent = '—';
-    document.getElementById('sunShort').textContent = t.enterArea;
     document.getElementById('airNumber').textContent = '—';
-    document.getElementById('airShort').textContent = t.enterArea;
+    startCardRotation('rain', [t.enterArea]);
+    startCardRotation('sun', [t.enterArea]);
+    startCardRotation('air', [t.enterArea]);
     return;
   }
 
@@ -1239,14 +1296,14 @@ function calculate() {
   let liters = 0;
   if (todayRainMM < 1) {
     document.getElementById('rainNumber').textContent = '0 mm';
-    document.getElementById('rainShort').textContent = t.noRainCaption;
-    renderDetailsList('rain', [{icon: '⛅', text: t.noRainCaption}]);
+    const rainFallback = [{icon: '⛅', text: t.noRainCaption}];
+    startCardRotation('rain', rainFallback);
+    renderDetailsList('rain', rainFallback);
   } else {
     liters = todayRainMM * sqm;
     animateNumber('rainNumber', todayRainMM.toFixed(1) + ' mm · ' + Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, liters, ' L');
-    const buckets15L = Math.max(1, Math.round(liters / 15));
-    document.getElementById('rainShort').textContent = '🪣 ≈ ' + buckets15L + (currentLang === 'hi' ? ' बाल्टी (15L)' : ' buckets (15L)');
     const comparisons = getComparisons(liters);
+    startCardRotation('rain', comparisons);
     renderDetailsList('rain', comparisons);
   }
 
@@ -1255,13 +1312,14 @@ function calculate() {
   if (currentSolar !== null && currentSolar > 0) {
     watts = calculateSolarPotential(currentSolar, sqm);
     animateNumber('sunNumber', watts.toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' W', true, watts, ' W');
-    const fans = Math.max(1, Math.round(watts / 60));
-    document.getElementById('sunShort').textContent = '🌀 ≈ ' + fans + (currentLang === 'hi' ? ' पंखे (60W)' : ' fans (60W)');
-    renderDetailsList('sun', getSunComparisons(watts, t));
+    const sunItems = getSunComparisons(watts, t);
+    startCardRotation('sun', sunItems);
+    renderDetailsList('sun', sunItems);
   } else {
     document.getElementById('sunNumber').textContent = '0 W';
-    document.getElementById('sunShort').textContent = t.noSunText;
-    renderDetailsList('sun', [{icon: '🌑', text: t.noSunText}]);
+    const sunFallback = [{icon: '🌑', text: t.noSunText}];
+    startCardRotation('sun', sunFallback);
+    renderDetailsList('sun', sunFallback);
   }
 
   // AIR card
@@ -1269,13 +1327,14 @@ function calculate() {
   if (currentHumidity !== null && currentTemp !== null) {
     airWater = calculateAirWater(currentTemp, currentHumidity, sqm);
     animateNumber('airNumber', Math.round(airWater).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, airWater, ' L');
-    const bottles = Math.max(1, Math.round(airWater / 1));
-    document.getElementById('airShort').textContent = '🍶 ≈ ' + bottles + (currentLang === 'hi' ? ' बोतलें (1L)' : ' bottles (1L)');
-    renderDetailsList('air', getAirComparisons(airWater, currentHumidity, t));
+    const airItems = getAirComparisons(airWater, currentHumidity, t);
+    startCardRotation('air', airItems);
+    renderDetailsList('air', airItems);
   } else {
     document.getElementById('airNumber').textContent = '—';
-    document.getElementById('airShort').textContent = t.enterArea;
-    renderDetailsList('air', [t.enterArea]);
+    const airFallback = [t.enterArea];
+    startCardRotation('air', airFallback);
+    renderDetailsList('air', airFallback);
   }
 
   updateSkyMood(t);
