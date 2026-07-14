@@ -382,12 +382,13 @@
 
   .sky-mood {
     text-align: center;
-    font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
-    font-size: 20px;
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+    font-size: 22px;
     font-weight: 700;
+    letter-spacing: 0.01em;
     color: var(--mist);
     margin-bottom: 2px;
-    min-height: 26px;
+    min-height: 28px;
   }
 
   .sky-card {
@@ -435,10 +436,24 @@
     margin-bottom: 6px;
   }
 
+  .sky-card-fact {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .fact-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    line-height: 1.4;
+  }
+
   .sky-card-text {
-    font-size: 13.5px;
-    line-height: 1.5;
-    color: var(--mist-dim);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--mist);
+    transition: opacity 0.4s ease;
+    font-weight: 500;
   }
 
   .compare-card {
@@ -595,19 +610,28 @@
     <div class="sky-card" id="rainSkyCard">
       <div class="sky-card-header"><span class="sky-card-icon">🌧️</span><span id="rainHeader">Rain</span><span class="trend-badge" id="rainTrend"></span></div>
       <div class="sky-card-number" id="rainNumber">0 mm</div>
-      <div class="sky-card-text" id="rainText">—</div>
+      <div class="sky-card-fact">
+        <span class="fact-icon" id="rainFactIcon">🚿</span>
+        <span class="sky-card-text" id="rainText">—</span>
+      </div>
     </div>
 
     <div class="sky-card" id="sunSkyCard">
       <div class="sky-card-header"><span class="sky-card-icon">☀️</span><span id="sunHeader">Sun</span></div>
       <div class="sky-card-number" id="sunNumber">0 W</div>
-      <div class="sky-card-text" id="sunText">—</div>
+      <div class="sky-card-fact">
+        <span class="fact-icon" id="sunFactIcon">⚡</span>
+        <span class="sky-card-text" id="sunText">—</span>
+      </div>
     </div>
 
     <div class="sky-card" id="airSkyCard">
-      <div class="sky-card-header"><span class="sky-card-icon">💨</span><span id="airHeader">Air</span></div>
+      <div class="sky-card-header"><span class="sky-card-icon">💦</span><span id="airHeader">Moisture</span></div>
       <div class="sky-card-number" id="airNumber">0 L</div>
-      <div class="sky-card-text" id="airText">—</div>
+      <div class="sky-card-fact">
+        <span class="fact-icon" id="airFactIcon">💦</span>
+        <span class="sky-card-text" id="airText">—</span>
+      </div>
     </div>
 
     <button class="reset-link" id="resetBtn" onclick="resetApp()">Check a different location</button>
@@ -670,19 +694,19 @@ const translations = {
     trendUp: "↑ more than yesterday",
     trendDown: "↓ less than yesterday",
     trendSame: "≈ same as yesterday",
-    sunComparisons: (w, bulbs, fans, phones, fridges) => [
-      `Right now, ${w} W of sunlight is hitting this area.`,
-      `Enough to power about ${bulbs} LED bulb${bulbs == 1 ? '' : 's'} (9W each).`,
-      `Or run about ${fans} table fan${fans == 1 ? '' : 's'} (60W each).`,
-      `Could charge roughly ${phones} phone${phones == 1 ? '' : 's'} at once (5W each).`,
-      `On the bigger end, that's close to ${fridges} refrigerator${fridges == 1 ? '' : 's'} worth of power (150W each).`
+    sunComparisons: (w, kw, bulbs, fans, homes, acUnits) => [
+      { icon: '⚡', text: `If this whole area were covered in solar panels, right now they'd generate about ${kw} kW.` },
+      { icon: '🏠', text: homes >= 1 ? `That's roughly enough to power ${homes} average Indian home${homes == 1 ? '' : 's'} right now.` : `That's a meaningful share of one home's typical power draw right now.` },
+      { icon: '❄️', text: `Or enough to run about ${acUnits} 1.5-ton AC unit${acUnits == 1 ? '' : 's'} (1500W each).` },
+      { icon: '💡', text: bulbs <= 50 ? `On a small scale, that's about ${bulbs} LED bulb${bulbs == 1 ? '' : 's'} (9W each).` : `At full scale, that's thousands of LED bulbs worth — hard to picture, but a real amount of clean power.` },
+      { icon: '🌀', text: `Or roughly ${fans} table fan${fans == 1 ? '' : 's'} running (60W each).` }
     ],
     airComparisons: (liters, humidity, drinkDays, bottles, showerMins) => [
-      `The air around your land is holding real moisture — about ${liters} L worth, at ${humidity}% humidity.`,
-      `That's roughly ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person, if it could be condensed.`,
-      `Or about ${bottles} standard 1L water bottle${bottles == 1 ? '' : 's'} worth.`,
-      `Enough, in theory, for about ${showerMins} minute${showerMins == 1 ? '' : 's'} of a shower (9L/min).`,
-      `This water isn't extractable at home — but it's genuinely there, all around you, right now.`
+      { icon: '💦', text: `The air around your land is holding real moisture — about ${liters} L worth, at ${humidity}% humidity.` },
+      { icon: '🥤', text: `That's roughly ${drinkDays} day${drinkDays == 1 ? '' : 's'} of drinking water for one person, if it could be condensed.` },
+      { icon: '🍶', text: `Or about ${bottles} standard 1L water bottle${bottles == 1 ? '' : 's'} worth.` },
+      { icon: '🚿', text: `Enough, in theory, for about ${showerMins} minute${showerMins == 1 ? '' : 's'} of a shower (9L/min).` },
+      { icon: '🌫️', text: `This water isn't extractable at home — but it's genuinely there, all around you, right now.` }
     ],
     solarFact: (watts) => `No rain, but real sunlight is hitting your roof right now — enough to generate roughly ${watts} watts if you had solar panels there.`,
     safetyStormy: "🌬️ Winds are strong right now — this feels more like a storm than gentle rain. Best to stay indoors.",
@@ -742,19 +766,19 @@ const translations = {
     trendUp: "↑ कल से ज़्यादा",
     trendDown: "↓ कल से कम",
     trendSame: "≈ कल जैसा",
-    sunComparisons: (w, bulbs, fans, phones, fridges) => [
-      `अभी इस जगह पर ${w} वाट धूप पड़ रही है।`,
-      `लगभग ${bulbs} LED बल्ब चलाने जितनी (हर एक 9 वाट)।`,
-      `या करीब ${fans} टेबल पंखे चलाने जितनी (हर एक 60 वाट)।`,
-      `लगभग ${phones} फोन एक साथ चार्ज करने जितनी (हर एक 5 वाट)।`,
-      `ज़्यादा मात्रा में, यह लगभग ${fridges} फ्रिज चलाने जितनी बिजली है (हर एक 150 वाट)।`
+    sunComparisons: (w, kw, bulbs, fans, homes, acUnits) => [
+      { icon: '⚡', text: `अगर यह पूरी जगह सोलर पैनल से ढकी होती, तो अभी लगभग ${kw} किलोवाट बिजली बनती।` },
+      { icon: '🏠', text: homes >= 1 ? `यह लगभग ${homes} औसत भारतीय घर${homes == 1 ? '' : 'ों'} को अभी चलाने जितना है।` : `यह एक घर की सामान्य बिजली खपत का एक अच्छा हिस्सा है।` },
+      { icon: '❄️', text: `या लगभग ${acUnits} 1.5-टन AC चलाने जितना (हर एक 1500 वाट)।` },
+      { icon: '💡', text: bulbs <= 50 ? `छोटे स्तर पर, यह लगभग ${bulbs} LED बल्ब जितना है (हर एक 9 वाट)।` : `पूरे स्तर पर, यह हज़ारों LED बल्ब जितना है — सोचना मुश्किल है, पर यह असली स्वच्छ ऊर्जा है।` },
+      { icon: '🌀', text: `या लगभग ${fans} टेबल पंखे चलाने जितना (हर एक 60 वाट)।` }
     ],
     airComparisons: (liters, humidity, drinkDays, bottles, showerMins) => [
-      `आपकी ज़मीन के आस-पास की हवा में असली नमी है — लगभग ${liters} लीटर, ${humidity}% नमी पर।`,
-      `यह लगभग ${drinkDays} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह पानी में बदल पाए।`,
-      `या लगभग ${bottles} लीटर की पानी की बोतलों जितना।`,
-      `सैद्धांतिक रूप से, लगभग ${showerMins} मिनट के शावर जितना (9 लीटर/मिनट)।`,
-      `यह पानी घर पर निकाला नहीं जा सकता — पर यह सच में, अभी आपके चारों ओर मौजूद है।`
+      { icon: '💦', text: `आपकी ज़मीन के आस-पास की हवा में असली नमी है — लगभग ${liters} लीटर, ${humidity}% नमी पर।` },
+      { icon: '🥤', text: `यह लगभग ${drinkDays} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह पानी में बदल पाए।` },
+      { icon: '🍶', text: `या लगभग ${bottles} लीटर की पानी की बोतलों जितना।` },
+      { icon: '🚿', text: `सैद्धांतिक रूप से, लगभग ${showerMins} मिनट के शावर जितना (9 लीटर/मिनट)।` },
+      { icon: '🌫️', text: `यह पानी घर पर निकाला नहीं जा सकता — पर यह सच में, अभी आपके चारों ओर मौजूद है।` }
     ],
     solarFact: (watts) => `बारिश नहीं है, पर अभी आपकी छत पर असली धूप पड़ रही है — अगर वहाँ सोलर पैनल होते, तो लगभग ${watts} वाट बिजली बन सकती थी।`,
     safetyStormy: "🌬️ अभी तेज़ हवा चल रही है — यह हल्की बारिश से ज़्यादा तूफ़ान जैसा लग रहा है। घर के अंदर रहना बेहतर होगा।",
@@ -785,15 +809,20 @@ function startCardRotation(cardKey, items) {
   if (cardRotations[cardKey]) clearInterval(cardRotations[cardKey].interval);
   let index = 0;
   const textEl = document.getElementById(cardKey + 'Text');
-  const numberEl = document.getElementById(cardKey + 'Number');
+  const iconEl = document.getElementById(cardKey + 'FactIcon');
 
   const render = () => {
     const item = items[index];
+    const itemText = typeof item === 'string' ? item : item.text;
+    const itemIcon = typeof item === 'string' ? null : item.icon;
     textEl.style.opacity = '0';
+    if (iconEl) iconEl.style.opacity = '0';
     setTimeout(() => {
-      textEl.textContent = item;
+      textEl.textContent = itemText;
+      if (iconEl && itemIcon) iconEl.textContent = itemIcon;
       textEl.style.opacity = '1';
-    }, 150);
+      if (iconEl) iconEl.style.opacity = '1';
+    }, 200);
   };
   render();
 
@@ -801,7 +830,7 @@ function startCardRotation(cardKey, items) {
     const interval = setInterval(() => {
       index = (index + 1) % items.length;
       render();
-    }, 4200);
+    }, 5800);
     cardRotations[cardKey] = { interval };
   } else {
     cardRotations[cardKey] = { interval: null };
@@ -809,11 +838,12 @@ function startCardRotation(cardKey, items) {
 }
 
 function getSunComparisons(watts, t) {
+  const kw = watts / 1000;
   const bulbs = Math.max(1, Math.round(watts / 9));
   const fans = Math.max(1, Math.round(watts / 60));
-  const phones = Math.max(1, Math.round(watts / 5));
-  const fridges = Math.max(1, Math.round(watts / 150));
-  return t.sunComparisons(watts, bulbs, fans, phones, fridges);
+  const homes = Math.max(1, Math.round(watts / 4000));
+  const acUnits = Math.max(1, Math.round(watts / 1500));
+  return t.sunComparisons(watts, kw.toFixed(1), bulbs, fans, homes, acUnits);
 }
 
 function getAirComparisons(liters, humidity, t) {
@@ -1160,11 +1190,11 @@ function calculate() {
   let liters = 0;
   if (todayRainMM < 1) {
     document.getElementById('rainNumber').textContent = '0 mm';
-    startCardRotation('rain', [t.noRainCaption]);
+    startCardRotation('rain', [{icon: '⛅', text: t.noRainCaption}]);
   } else {
     liters = todayRainMM * sqm;
     animateNumber('rainNumber', todayRainMM.toFixed(1) + ' mm · ' + Math.round(liters).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, liters, ' L');
-    const comparisons = getComparisons(liters).map(c => c.text);
+    const comparisons = getComparisons(liters);
     startCardRotation('rain', comparisons);
   }
 
@@ -1176,7 +1206,7 @@ function calculate() {
     startCardRotation('sun', getSunComparisons(watts, t));
   } else {
     document.getElementById('sunNumber').textContent = '0 W';
-    startCardRotation('sun', [t.noSunText]);
+    startCardRotation('sun', [{icon: '🌑', text: t.noSunText}]);
   }
 
   // AIR card
