@@ -392,11 +392,12 @@
 
   .sky-report-title {
     font-family: 'Noto Serif', 'Noto Serif Devanagari', serif;
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--mist);
     text-align: center;
-    margin-top: 6px;
+    margin-top: 2px;
+    margin-bottom: 0;
   }
 
   .sky-mood {
@@ -406,8 +407,9 @@
     font-weight: 700;
     letter-spacing: 0.01em;
     color: var(--mist);
-    margin-bottom: 2px;
-    min-height: 28px;
+    margin-top: 0;
+    margin-bottom: 4px;
+    min-height: 24px;
   }
 
   .sky-card {
@@ -453,7 +455,15 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+  }
+
+  .fact-icon-text-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
   }
 
   .sky-card-number {
@@ -490,6 +500,10 @@
     line-height: 1.45;
     color: var(--mist);
     transition: opacity 0.4s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
 
   .details-toggle {
@@ -691,8 +705,10 @@
         <div class="sky-card-row">
           <span class="sky-card-number" id="rainNumber">0 mm</span>
           <span class="eq-sign">=</span>
-          <img class="fact-icon-big" id="rainFactIcon" src="">
-          <span class="sky-card-text" id="rainFactText">—</span>
+          <div class="fact-icon-text-group">
+            <img class="fact-icon-big" id="rainFactIcon" src="">
+            <span class="sky-card-text" id="rainFactText">—</span>
+          </div>
         </div>
         <button class="details-toggle" onclick="toggleDetails('rain')"><span id="rainToggleLabel">Details</span> ▾</button>
         <div class="sky-card-details" id="rainDetails" style="display:none;"></div>
@@ -703,8 +719,10 @@
         <div class="sky-card-row">
           <span class="sky-card-number" id="sunNumber">0 W</span>
           <span class="eq-sign">=</span>
-          <img class="fact-icon-big" id="sunFactIcon" src="">
-          <span class="sky-card-text" id="sunFactText">—</span>
+          <div class="fact-icon-text-group">
+            <img class="fact-icon-big" id="sunFactIcon" src="">
+            <span class="sky-card-text" id="sunFactText">—</span>
+          </div>
         </div>
         <button class="details-toggle" onclick="toggleDetails('sun')"><span id="sunToggleLabel">Details</span> ▾</button>
         <div class="sky-card-details" id="sunDetails" style="display:none;"></div>
@@ -715,8 +733,10 @@
         <div class="sky-card-row">
           <span class="sky-card-number" id="airNumber">0 L</span>
           <span class="eq-sign">=</span>
-          <img class="fact-icon-big" id="airFactIcon" src="">
-          <span class="sky-card-text" id="airFactText">—</span>
+          <div class="fact-icon-text-group">
+            <img class="fact-icon-big" id="airFactIcon" src="">
+            <span class="sky-card-text" id="airFactText">—</span>
+          </div>
         </div>
         <button class="details-toggle" onclick="toggleDetails('air')"><span id="airToggleLabel">Details</span> ▾</button>
         <div class="sky-card-details" id="airDetails" style="display:none;"></div>
@@ -793,6 +813,7 @@ const translations = {
     sunBig: (n) => `Strong sunlight — enough right now for roughly ${n} refrigerator${n == 1 ? '' : 's'} worth of power (150W each).`,
     airDrinkDays: (liters, days) => `That's roughly ${days} day${days == 1 ? '' : 's'} of drinking water for one person, if this vapor could be condensed.`,
     noSunText: "No usable sunlight detected right now — try again during daylight hours.",
+    noSunShort: "no sun right now",
     humidityWord: "humidity",
     showDetails: "Details",
     hideDetails: "Hide",
@@ -867,6 +888,7 @@ const translations = {
     sunBig: (n) => `तेज़ धूप है — अभी लगभग ${n} फ्रिज चलाने जितनी बिजली बन सकती है (हर एक 150 वाट)।`,
     airDrinkDays: (liters, days) => `यह लगभग ${days} दिन के एक व्यक्ति के पीने के पानी जितना है, अगर यह भाप पानी में बदल पाए।`,
     noSunText: "अभी उपयोगी धूप नहीं मिली — दिन के समय दोबारा कोशिश करें।",
+    noSunShort: "अभी धूप नहीं",
     humidityWord: "नमी",
     showDetails: "विवरण",
     hideDetails: "छुपाएं",
@@ -1358,7 +1380,7 @@ function calculate() {
     renderDetailsList('sun', sunItems);
   } else {
     document.getElementById('sunNumber').textContent = '0 W';
-    const sunFallback = [{icon: '🌑', text: t.noSunText}];
+    const sunFallback = [{icon: 'sun', text: t.noSunShort, longText: t.noSunText}];
     startCardRotation('sun', sunFallback);
     renderDetailsList('sun', sunFallback);
   }
@@ -1367,7 +1389,7 @@ function calculate() {
   let airWater = 0;
   if (currentHumidity !== null && currentTemp !== null) {
     airWater = calculateAirWater(currentTemp, currentHumidity, sqm);
-    animateNumber('airNumber', Math.round(airWater).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + ' L', true, airWater, ' L');
+    animateNumber('airNumber', Math.round(airWater).toLocaleString(currentLang === 'hi' ? 'hi-IN' : 'en-IN') + (currentLang === 'hi' ? ' लीटर' : ' litres'), true, airWater, (currentLang === 'hi' ? ' लीटर' : ' litres'));
     const airItems = getAirComparisons(airWater, currentHumidity, t);
     startCardRotation('air', airItems);
     renderDetailsList('air', airItems);
